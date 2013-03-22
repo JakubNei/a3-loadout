@@ -68,11 +68,20 @@ removeAllAssignedItems _t;
 
 _t removeWeapon (primaryWeapon _t);
 _w = _d select 1;             
-if(_w != "") then {                                                            
-  _t addMagazine (getArray(configFile>>"CfgWeapons">>_w>>"magazines") select 0); // add primary weapon mag                                                                                                           
+if(_w != "") then {             
+  _m = getArray(configFile>>"CfgWeapons">>_w>>"magazines") select 0;                                               
+  _t addMagazine _m; // add primary weapon mag    
+  waitUntil{_m in magazines _t};
+                                                                                                             
   _mz = getArray(configFile>>"CfgWeapons">>_w>>"muzzles");
-  { if (_x != "this") then { _t addMagazine (getArray(configFile>>"CfgWeapons">>_w>>_x>>"magazines") select 0); }; } forEach _mz; // add one mag for each muzzle   
-                    
+  { 
+    if (_x != "this") then {
+      _m = getArray(configFile>>"CfgWeapons">>_w>>_x>>"magazines") select 0;
+      _t addMagazine _m;
+      waitUntil{_m in magazines _t}; 
+    };
+  } forEach _mz; // add one mag for each muzzle
+                
   _t addWeapon _w;                                                                                    
   { if(_x!="") then { _t removeItemFromPrimaryWeapon _x }; } forEach (primaryWeaponItems _t);                                 
   { if(_x!="") then { _t addPrimaryWeaponItem _x; }; } foreach (_d select 2);                             
@@ -87,7 +96,9 @@ if(_w != "") then {
 _t removeWeapon (handgunWeapon _t);
 _w =_d select 3;
 if(_w != "") then {
-  _t addMagazine (getArray(configFile>>"CfgWeapons">>_w>>"magazines") select 0);
+  _m = (getArray(configFile>>"CfgWeapons">>_w>>"magazines") select 0);
+  _t addMagazine _m;
+  waitUntil{_m in magazines _t};
   _t addWeapon _w;
   { if(_x!="") then { _t addHandgunItem _x; }; } foreach (_d select 4);
   if(!_s) then {
@@ -99,7 +110,9 @@ if(_w != "") then {
 _t removeWeapon (secondaryWeapon _t);
 _w = _d select 5;
 if(_w != "") then {
-  _t addMagazine (getArray(configFile>>"CfgWeapons">>_w>>"magazines") select 0);
+  _m = (getArray(configFile>>"CfgWeapons">>_w>>"magazines") select 0);
+  _t addMagazine _m;
+  waitUntil{_m in magazines _t};
   _t addWeapon _w;
   { if(_x!="") then { _t addSecondaryWeaponItem _x; }; } foreach (_d select 6);
   if(!_s) then {
