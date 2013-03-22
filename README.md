@@ -84,7 +84,7 @@ For those struggling with file hierarchy
 
 ![Alt text](http://i.imgur.com/ymyA6bs.png)
 
-Notice the description.ext file, you need that if you want respawn. Check out wiki for how-to. [community.bistudio.com/wiki/Description.ext](http://community.bistudio.com/wiki/Description.ext)
+Notice the description.ext file, you need that if you want respawn. Check out wiki for how-to. [community.bistudio.com/wiki/Description.ext](http://community.bistudio.com/wiki/Description.ext#respawn)
 
 <br>
 If your loadout is loaded but you can not use grenades try this
