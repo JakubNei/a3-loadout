@@ -58,7 +58,6 @@ _add = {
 
 // we need to add items somewhere before we can assign them
 removeBackpack _t;
-sleep 0.001;
 _t addBackpack "B_AssaultPack_blk"; 
 removeAllAssignedItems _t;
 { 
@@ -112,7 +111,6 @@ if(_w != "") then {
 removeUniform _t;
 _p = 0;
 if(_d select 7 != "") then {
-  sleep 0.001;
   _t addUniform (_d select 7);
   { [_t,_x] call _add; } foreach (_d select 8);
   // fill uniform with placeholders
@@ -125,7 +123,7 @@ if(_d select 7 != "") then {
 
 removeVest _t;
 if(_d select 9 != "") then {
-  sleep 0.001;
+  waitUntil{vest _t == ""};
   _t addVest (_d select 9);
   { [_t,_x] call _add; } foreach (_d select 10);
 };       
@@ -151,7 +149,6 @@ _add = {
 
 removeBackpack _t;
 if(_d select 11!="") then {
-  sleep 0.001;
   _t addBackpack (_d select 11);                                                                    
   _c = unitBackpack _t; 
   clearWeaponCargo _c;
@@ -168,13 +165,11 @@ for "_i" from 1 to _p do {
 
 removeHeadgear _t;
 if(_d select 13!="") then {
-  sleep 0.001;
   _t addHeadgear (_d select 13);
 };
 
 removeGoggles _t;
 if(_d select 14!="") then {
-  sleep 0.001;
   _t addGoggles (_d select 14);
 };
 
