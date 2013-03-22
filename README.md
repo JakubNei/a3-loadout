@@ -48,7 +48,7 @@ loadout = [player] call getLoadout;
                                                      
 // Load saved loadout on respawn
 player addEventHandler ["Respawn", {
-    [player,loadout] spawn setLoadout;
+    [player,loadout] call setLoadout;
   }
 ];
 ```
@@ -73,7 +73,7 @@ setLoadout = compile preprocessFileLineNumbers 'fnc_set_loadout.sqf';
 
 // Load saved loadout on respawn
 player addEventHandler ["Respawn", {
-    [player,loadout] spawn setLoadout;
+    [player,loadout] call setLoadout;
   }
 ];
 ```
@@ -93,7 +93,7 @@ If your loadout is loaded but you can not use grenades try this
 player addEventHandler ["Respawn", {
     [] spawn {
       sleep 1; // If it still doest not work add more sleep D:
-      [player,loadout] spawn setLoadout;
+      [player,loadout] call setLoadout;
     };
   }
 ];
