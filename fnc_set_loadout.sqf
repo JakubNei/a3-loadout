@@ -123,7 +123,6 @@ if(_d select 7 != "") then {
 
 removeVest _t;
 if(_d select 9 != "") then {
-  waitUntil{vest _t == ""};
   _t addVest (_d select 9);
   { [_t,_x] call _add; } foreach (_d select 10);
 };       
