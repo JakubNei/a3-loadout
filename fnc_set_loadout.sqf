@@ -2,7 +2,7 @@
 
   AUTHOR: aeroson
   NAME: fnc_set_loadout.sqf
-  VERSION: 2.8
+  VERSION: 2.9
   
   
   PARAMETER(S):
