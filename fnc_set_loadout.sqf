@@ -15,9 +15,8 @@
   
 */
 
+private ["_t","_d","_s","_w","_m","_mz","_p"];
 
-_t = 0;
-_d = 0;
 
 // addAction support
 if(count _this == 2) then {
@@ -96,7 +95,7 @@ if(_w != "") then {
 _t removeWeapon (handgunWeapon _t);
 _w =_d select 3;
 if(_w != "") then {
-  _m = (getArray(configFile>>"CfgWeapons">>_w>>"magazines") select 0);
+  _m = getArray(configFile>>"CfgWeapons">>_w>>"magazines") select 0;
   _t addMagazine _m;
   waitUntil{_m in magazines _t};
   _t addWeapon _w;
@@ -110,7 +109,7 @@ if(_w != "") then {
 _t removeWeapon (secondaryWeapon _t);
 _w = _d select 5;
 if(_w != "") then {
-  _m = (getArray(configFile>>"CfgWeapons">>_w>>"magazines") select 0);
+  _m = getArray(configFile>>"CfgWeapons">>_w>>"magazines") select 0;
   _t addMagazine _m;
   waitUntil{_m in magazines _t};
   _t addWeapon _w;
