@@ -2,7 +2,7 @@
 
   AUTHOR: aeroson
   NAME: fnc_get_loadout.sqf
-  VERSION: 2
+  VERSION: 2.1
   
   
   PARAMETER(S):
@@ -17,8 +17,8 @@
 
 */
 
+private ["_t","_d"];
 
-_t = 0;
 
 // addAction support
 if(count _this == 1) then {
