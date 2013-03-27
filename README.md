@@ -42,8 +42,8 @@ loadout = [player] call getLoadout;
 
 // Add save/load loadout actions to all ammo boxes
 {
-  _x addAction ["Save loadout", "fnc_get_loadout.sqf"];
-  _x addAction ["Load loadout", "fnc_set_loadout.sqf"];
+  _x addAction ["<t color='#ff1111'>Save loadout</t>", "fnc_get_loadout.sqf"];
+  _x addAction ["<t color='#00cc00'>Load loadout</t>", "fnc_set_loadout.sqf"];
 } forEach nearestObjects [getpos player,["ReammoBox","ReammoBox_F"],15000];
                                                      
 // Load saved loadout on respawn
