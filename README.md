@@ -107,3 +107,15 @@ profileNamespace setVariable ["loadout",loadout];
 // Loads loadout from profileNamespace into var loadout
 loadout=profileNamespace getVariable "loadout";
 ```
+
+<br>
+##Loadout manager
+A nice scroll wheel based loadout manager.
+Uses profileNamespace so all loadouts are saved permanently into your profile.
+
+![Alt text](http://i.imgur.com/88R2KwF.png)
+
+Put this into init lion of object you wish to be loadout manager
+```
+0 = [this] execVM 'loadout_manager.sqf';
+```  
