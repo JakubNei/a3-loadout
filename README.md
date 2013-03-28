@@ -110,12 +110,13 @@ loadout=profileNamespace getVariable "loadout";
 
 <br>
 ##Loadout manager
-A nice scroll wheel based loadout manager.
+A simple scroll wheel based loadout manager.
 Uses profileNamespace so all loadouts are saved permanently into your profile.
+Requres compiled set/get functions (just leave them in the mission's init.sqf)
 
 ![Alt text](http://i.imgur.com/88R2KwF.png)
 
-Put this into init lion of object you wish to be loadout manager
+Put this into init line of object you wish to be loadout manager
 ```
 0 = [this] execVM 'loadout_manager.sqf';
 ```  
