@@ -119,8 +119,10 @@ getLoadout = compile preprocessFileLineNumbers 'fnc_get_loadout.sqf';
 setLoadout = compile preprocessFileLineNumbers 'fnc_set_loadout.sqf';
 ```
 
+<br>
 ![Alt text](http://i.imgur.com/88R2KwF.png)
 
+<br>
 Put this into init line of object you wish to be loadout manager
 ```
 0 = [this] execVM 'loadout_manager.sqf';
