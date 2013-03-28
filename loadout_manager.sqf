@@ -5,7 +5,7 @@
   VERSION: 1
   
   REQUIRES:
-  requres compiled set/get functions (just leave them in the mission's init.sqf)
+  requires compiled set/get functions (usually in the mission's init.sqf) 
   getLoadout = compile preprocessFileLineNumbers 'fnc_get_loadout.sqf';
   setLoadout = compile preprocessFileLineNumbers 'fnc_set_loadout.sqf';
   
