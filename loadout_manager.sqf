@@ -41,16 +41,16 @@ _mainMenu = {
   _loadout = profileNamespace getVariable "aero_loadout";
   if !isNil("_loadout") then {
     if (count(_loadout)>0) then {
-      _actions = _actions + [ _obj addAction ["<t color='#ff1111'>Remove loadout</t>", "client\loadout\manager.sqf", ["remove_menu"], -3001] ];
+      _actions = _actions + [ _obj addAction ["<t color='#ff1111'>Remove loadout</t>", "loadout_manager.sqf", ["remove_menu"], -3001] ];
     };
     for "_i" from 0 to count(_loadout) do {
       _l = _loadout select _i;
       if !isNil("_l") then {    
-        _actions = _actions + [_obj addAction [format["<t color='#00cc00'>Load <t size='0.75'>%1</t></t>",_l select 0], "client\loadout\manager.sqf", ["load",_i], -2000+_i]];
+        _actions = _actions + [_obj addAction [format["<t color='#00cc00'>Load <t size='0.75'>%1</t></t>",_l select 0], "loadout_manager.sqf", ["load",_i], -2000+_i]];
       };
     };
   };
-  _actions = _actions + [ _obj addAction ["<t color='#ff8822'>Save loadout</t>", "client\loadout\manager.sqf", ["save_menu"], -3000] ];
+  _actions = _actions + [ _obj addAction ["<t color='#ff8822'>Save loadout</t>", "loadout_manager.sqf", ["save_menu"], -3000] ];
 };
  
 
@@ -92,13 +92,13 @@ switch (_args select 0) do {
   
     call _removeActions;
     
-    _actions = _actions + [_obj addAction ["<t color='#cccccc'>... back</t>", "client\loadout\manager.sqf", ["back"], -1000, false, false]];
-    _actions = _actions + [_obj addAction ["<t color='#ffcc66'>Save as new</t>", "client\loadout\manager.sqf", ["save",-1], -1001]];
+    _actions = _actions + [_obj addAction ["<t color='#cccccc'>... back</t>", "loadout_manager.sqf", ["back"], -1000, false, false]];
+    _actions = _actions + [_obj addAction ["<t color='#ffcc66'>Save as new</t>", "loadout_manager.sqf", ["save",-1], -1001]];
     
     for "_i" from 0 to (count(_loadout)-1) do {
       _l = _loadout select _i;
       if !isNil("_l") then {    
-        _actions = _actions + [_obj addAction [format["<t color='#ff8822'>Replace <t size='0.75'>%1</t></t>",_l select 0], "client\loadout\manager.sqf", ["save",_i], -2000+_i]];
+        _actions = _actions + [_obj addAction [format["<t color='#ff8822'>Replace <t size='0.75'>%1</t></t>",_l select 0], "loadout_manager.sqf", ["save",_i], -2000+_i]];
       };
     };
     
@@ -109,12 +109,12 @@ switch (_args select 0) do {
   
     call _removeActions;
     
-    _actions = _actions + [_obj addAction ["<t color='#cccccc'>... back</t>", "client\loadout\manager.sqf", ["back"], -1000, false, false]];
+    _actions = _actions + [_obj addAction ["<t color='#cccccc'>... back</t>", "loadout_manager.sqf", ["back"], -1000, false, false]];
       
     for "_i" from 0 to (count(_loadout)-1) do {
       _l = _loadout select _i;
       if !isNil("_l") then {    
-        _actions = _actions + [_obj addAction [format["<t color='#ff1111'>Remove <t size='0.75'>%1</t></t>",_l select 0], "client\loadout\manager.sqf", ["remove",_i], -2000+_i]];
+        _actions = _actions + [_obj addAction [format["<t color='#ff1111'>Remove <t size='0.75'>%1</t></t>",_l select 0], "loadout_manager.sqf", ["remove",_i], -2000+_i]];
       };
     };
   
