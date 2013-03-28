@@ -112,7 +112,12 @@ loadout=profileNamespace getVariable "loadout";
 ##Loadout manager
 A simple scroll wheel based loadout manager.
 Uses profileNamespace so all loadouts are saved permanently into your profile.
-Requres compiled set/get functions (just leave them in the mission's init.sqf)
+
+Requres compiled set/get functions (usually in the mission's init.sqf)
+```
+getLoadout = compile preprocessFileLineNumbers 'fnc_get_loadout.sqf';
+setLoadout = compile preprocessFileLineNumbers 'fnc_set_loadout.sqf';
+```
 
 ![Alt text](http://i.imgur.com/88R2KwF.png)
 
