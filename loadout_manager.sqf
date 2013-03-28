@@ -5,12 +5,16 @@
   VERSION: 1
   
   REQUIRES:
-  requires compiled set and get loadout functions
+  requres compiled set/get functions (just leave them in the mission's init.sqf)
   getLoadout = compile preprocessFileLineNumbers 'fnc_get_loadout.sqf';
   setLoadout = compile preprocessFileLineNumbers 'fnc_set_loadout.sqf';
   
+  DOWNLOAD & PARTICIPATE:
+  https://github.com/aeroson/get-set-loadout
+  http://forums.bistudio.com/showthread.php?148577-GET-SET-Loadout-(saves-and-loads-pretty-much-everything)
+  
   USAGE:
-  put this into init lion of object you wish to be loadout manager
+  put this into init line of object you wish to be loadout manager
   0 = [this] execVM 'loadout_manager.sqf';
   
 */
