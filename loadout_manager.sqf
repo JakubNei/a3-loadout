@@ -38,19 +38,22 @@ _removeActions = {
 
 // show main menu
 _mainMenu = {
+  private ["_loadout","_any","_l"];
   _loadout = profileNamespace getVariable "aero_loadout";
   if !isNil("_loadout") then {
-    if (count(_loadout)>0) then {
-      _actions = _actions + [ _obj addAction ["<t color='#ff1111'>Remove loadout</t>", "loadout_manager.sqf", ["remove_menu"], -3001] ];
-    };
+    _any = false;
     for "_i" from 0 to count(_loadout) do {
       _l = _loadout select _i;
-      if !isNil("_l") then {    
-        _actions = _actions + [_obj addAction [format["<t color='#00cc00'>Load </t><t size='1.5'>%1</t>",_l select 0], "loadout_manager.sqf", ["load",_i], -2000+_i]];
+      if !isNil("_l") then {
+        _any = true;    
+        _actions = _actions + [_obj addAction [format["<t color='#00cc00'>Load </t><t size='1.5'>%1</t>",_l select 0], "client\loadout\manager.sqf", ["load",_i], -2000+_i]];
       };
     };
+    if _any then {
+      _actions = _actions + [ _obj addAction ["<t color='#ff1111'>Remove loadout</t>", "client\loadout\manager.sqf", ["remove_menu"], -3001] ];
+    };
   };
-  _actions = _actions + [ _obj addAction ["<t color='#ff8822'>Save loadout</t>", "loadout_manager.sqf", ["save_menu"], -3000] ];
+  _actions = _actions + [ _obj addAction ["<t color='#ff8822'>Save loadout</t>", "client\loadout\manager.sqf", ["save_menu"], -3000] ];
 };
  
 
