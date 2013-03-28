@@ -46,7 +46,7 @@ _mainMenu = {
     for "_i" from 0 to count(_loadout) do {
       _l = _loadout select _i;
       if !isNil("_l") then {    
-        _actions = _actions + [_obj addAction [format["<t color='#00cc00'>Load <t size='0.75'>%1</t></t>",_l select 0], "loadout_manager.sqf", ["load",_i], -2000+_i]];
+        _actions = _actions + [_obj addAction [format["<t color='#00cc00'>Load </t><t size='1.5'>%1</t>",_l select 0], "loadout_manager.sqf", ["load",_i], -2000+_i]];
       };
     };
   };
@@ -98,7 +98,7 @@ switch (_args select 0) do {
     for "_i" from 0 to (count(_loadout)-1) do {
       _l = _loadout select _i;
       if !isNil("_l") then {    
-        _actions = _actions + [_obj addAction [format["<t color='#ff8822'>Replace <t size='0.75'>%1</t></t>",_l select 0], "loadout_manager.sqf", ["save",_i], -2000+_i]];
+        _actions = _actions + [_obj addAction [format["<t color='#ff8822'>Replace </t><t size='1.5'>%1</t>",_l select 0], "loadout_manager.sqf", ["save",_i], -2000+_i]];
       };
     };
     
@@ -114,7 +114,7 @@ switch (_args select 0) do {
     for "_i" from 0 to (count(_loadout)-1) do {
       _l = _loadout select _i;
       if !isNil("_l") then {    
-        _actions = _actions + [_obj addAction [format["<t color='#ff1111'>Remove <t size='0.75'>%1</t></t>",_l select 0], "loadout_manager.sqf", ["remove",_i], -2000+_i]];
+        _actions = _actions + [_obj addAction [format["<t color='#ff1111'>Remove </t><t size='1.5'>%1</t>",_l select 0], "loadout_manager.sqf", ["remove",_i], -2000+_i]];
       };
     };
   
@@ -126,7 +126,8 @@ switch (_args select 0) do {
     call _removeActions;
     
     // set desired loadout at index to nil (remove it)
-    hint parseText format["<t color='#ff1111'>Removed loadout<br /><br /><t size='0.9'>%1</t></t>",(_loadout select _loadoutIndex) select 0];
+    _loadoutName = (_loadout select _loadoutIndex) select 0;
+    hint parseText format["<t size='1' color='#ff1111'>Removed loadot</t>"];
     _loadout set[_loadoutIndex, nil];
     profileNamespace setVariable ["aero_loadout",_loadout];
     
@@ -137,7 +138,6 @@ switch (_args select 0) do {
 
   case "save": {
 
-    hint parseText format["<t color='#ff8822'>Saving loadout<br /><br /><br />"];
     call _removeActions; 
 
     // find empty loadout index
@@ -152,22 +152,17 @@ switch (_args select 0) do {
         _i = _i + 1;
       };
     };
-                  
-    // determine loadout name    
-    _loadoutName = getText(configFile>>"cfgWeapons">>(primaryWeapon _target)>>"displayname");
-    if (_loadoutName=="") then {
-      _loadoutName = getText(configFile>>"cfgWeapons">>(handgunWeapon _target)>>"displayname");
-    };
-    if (_loadoutName=="") then {
-      _loadoutName = getText(configFile>>"cfgWeapons">>(secondaryWeapon _target)>>"displayname");
-    };            
-    _loadoutName = _loadoutName +" / "+getText(configFile>>"cfgWeapons">>(uniform _target)>>"displayname");
     
-    if (backpack _target!="") then {    
-      _loadoutName = _loadoutName +" / "+getText(configFile>>"cfgvehicles">>(backpack _target)>>"displayname");
-    };
+    _loadoutName = 
+      "<img image='"+getText(configFile>>"cfgweapons">>(primaryWeapon _target)>>"picture")+"'/>" +
+      "<img image='"+getText(configFile>>"cfgweapons">>(handgunWeapon _target)>>"picture")+"'/>" +
+      "<img image='"+getText(configFile>>"cfgweapons">>(secondaryWeapon _target)>>"picture")+"'/>" +
+      "<img image='"+getText(configFile>>"cfgweapons">>(headgear _target)>>"picture")+"'/>" +
+      "<img image='"+getText(configFile>>"cfgweapons">>(uniform _target)>>"picture")+"'/>" +
+      "<img image='"+getText(configFile>>"cfgweapons">>(vest _target)>>"picture")+"'/>" +
+      "<img image='"+getText(configFile>>"cfgvehicles">>(backpack _target)>>"picture")+"'/>";  
    
-    hintSilent parseText format["<t color='#ff8822'>Saving loadout<br /><br /><t size='0.9'>%1</t></t>",_loadoutName];   
+    hintSilent parseText format["<t size='1' color='#ff8822'>Saving loadout</t>"];   
      
     _loadout set
     [
@@ -180,7 +175,7 @@ switch (_args select 0) do {
       
     profileNamespace setVariable ["aero_loadout",_loadout];
     call _mainMenu;  
-    hint parseText format["<t color='#ff8822'>Saved loadout<br /><br /><t size='0.9'>%1</t></t>",_loadoutName];
+    hint parseText format["<t size='1' color='#ff8822'>Saved loadout</t>"];
 
   };
   
@@ -192,9 +187,11 @@ switch (_args select 0) do {
     if ( isNil("_loadout") ) then {    
       hint "This loadout is empty !";      
     } else {     
-      hint parseText format["<t color='#00cc00'>Loading loadout<br /><br /><t size='0.9'>%1</t></t>",_loadout select 0];      
+      _loadoutName = _loadout select 0;
+      hint parseText format["<t size='1' color='#00cc00'>Loading loadout</t>"];      
       [_target, _loadout select 1] call setLoadout;            
-      hint parseText format["<t color='#00cc00'>Loaded loadout<br /><br /><t size='0.9'>%1</t></t>",_loadout select 0];      
+      hint parseText format["<t size='1' color='#00cc00'>Loaded loadout</t>"];
+      //hint parseText format["<t size='1' color='#00cc00'>Loaded</t><br /><br /><t size='6'>%1</t>",_loadoutName];      
     }; 
        
   };
