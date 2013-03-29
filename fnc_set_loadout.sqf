@@ -4,186 +4,184 @@
   NAME: fnc_set_loadout.sqf
   VERSION: 2.9
   
-  DOWNLOAD & PARTICIPATE:
-  https://github.com/aeroson/get-set-loadout
-  http://forums.bistudio.com/showthread.php?148577-GET-SET-Loadout-(saves-and-loads-pretty-much-everything)
-
+  
   PARAMETER(S):
   0 : target unit
   1 : array of strings/arrays containing desired target unit's loadout, obtained from fnc_get_loadout.sqf
-    
+  
+  
   addAction support:
   Sets player's loadout from global var loadout
   
 */
 
-private ["_t","_d","_s","_w","_m","_mz","_p"];
+private ["_target","_data","_selectedWeapon","_weapon","_magazine","_magazine","_placeholderCount"];
 
 
 // addAction support
 if(count _this == 2) then {
-  _t = _this select 0;
-  _d = _this select 1;
+  _target = _this select 0;
+  _data = _this select 1;
 } else {
-  _t = player;
-  _d = loadout;
-  playSound3D ["A3\Sounds_F\sfx\ZoomIn.wav", _t];  
+  _target = player;
+  _data = loadout;
+  playSound3D ["A3\Sounds_F\sfx\ZoomIn.wav", _target];  
 };
 
 
-if(count _d != 15) exitWith {
-  if(_t == player) then {
+if(count _data != 15) exitWith {
+  if(_target == player) then {
     hint "You were trying to set/load corrupted loadout";
   };
 };
 
 
-_s = false; // did we already do selectWeapon ?
+_selectedWeapon = false; // did we already do selectWeapon ?
 
 
 _add = {
-  private ["_c","_i"];
-  _c = _this select 0;
-  _i = _this select 1;
-  if(isClass(configFile>>"CfgMagazines">>_i)) then {
-    _c addMagazine _i;
+  private ["_cargo","_item"];
+  _cargo = _this select 0;
+  _item = _this select 1;
+  if(isClass(configFile>>"CfgMagazines">>_item)) then {
+    _cargo addMagazine _item;
   } else {
-    if(isClass(configFile>>"CfgWeapons">>_i>>"WeaponSlotsInfo")&&getNumber(configFile>>"CfgWeapons">>_i>>"showempty")==1) then {
-      _c addWeapon _i;
+    if(isClass(configFile>>"CfgWeapons">>_item>>"WeaponSlotsInfo")&&getNumber(configFile>>"CfgWeapons">>_item>>"showempty")==1) then {
+      _cargo addWeapon _item;
     } else {
-      _c addItem _i;
+      _cargo addItem _item;
     };
   };
 };  
 
 
 // we need to add items somewhere before we can assign them
-removeBackpack _t;
-_t addBackpack "B_AssaultPack_blk"; 
-removeAllAssignedItems _t;
+removeBackpack _target;
+_target addBackpack "B_AssaultPack_blk"; 
+removeAllAssignedItems _target;
 { 
-  [_t,_x] call _add;
-  _t assignItem _x;
-} foreach (_d select 0);
+  [_target,_x] call _add;
+  _target assignItem _x;
+} foreach (_data select 0);
 
 
-_t removeWeapon (primaryWeapon _t);
-_w = _d select 1;             
-if(_w != "") then {             
-  _m = getArray(configFile>>"CfgWeapons">>_w>>"magazines") select 0;                                               
-  _t addMagazine _m; // add primary weapon mag    
-  waitUntil{_m in magazines _t};
+_target removeWeapon (primaryWeapon _target);
+_weapon = _data select 1;             
+if(_weapon != "") then {             
+  _magazine = getArray(configFile>>"CfgWeapons">>_weapon>>"magazines") select 0;                                               
+  _target addMagazine _magazine; // add primary weapon mag    
+  waitUntil{_magazine in (magazines _target)};
                                                                                                              
-  _mz = getArray(configFile>>"CfgWeapons">>_w>>"muzzles");
+  _magazine = getArray(configFile>>"CfgWeapons">>_weapon>>"muzzles");
   { 
     if (_x != "this") then {
-      _m = getArray(configFile>>"CfgWeapons">>_w>>_x>>"magazines") select 0;
-      _t addMagazine _m;
-      waitUntil{_m in magazines _t}; 
+      _magazine = getArray(configFile>>"CfgWeapons">>_weapon>>_x>>"magazines") select 0;
+      _target addMagazine _magazine;
+      waitUntil{_magazine in (magazines _target)}; 
     };
-  } forEach _mz; // add one mag for each muzzle
+  } forEach _magazine; // add one mag for each muzzle
                 
-  _t addWeapon _w;                                                                                    
-  { if(_x!="") then { _t removeItemFromPrimaryWeapon _x }; } forEach (primaryWeaponItems _t);                                 
-  { if(_x!="") then { _t addPrimaryWeaponItem _x; }; } foreach (_d select 2);                             
+  _target addWeapon _weapon;                                                                                    
+  { if(_x!="") then { _target removeItemFromPrimaryWeapon _x }; } forEach (primaryWeaponItems _target);                                 
+  { if(_x!="") then { _target addPrimaryWeaponItem _x; }; } foreach (_data select 2);                             
                                               
-  if (_mz select 0 != "this") then {                                                                        
-    _w = _mz select 0;                                                                                      
+  if (_magazine select 0 != "this") then {                                                                        
+    _weapon = _magazine select 0;                                                                                      
   };                                                                                                        
-  _t selectWeapon _w;                                                                                       
-  _s = true;                                                                                                   
+  _target selectWeapon _weapon;                                                                                       
+  _selectedWeapon = true;                                                                                                   
 };
 
-_t removeWeapon (handgunWeapon _t);
-_w =_d select 3;
-if(_w != "") then {
-  _m = getArray(configFile>>"CfgWeapons">>_w>>"magazines") select 0;
-  _t addMagazine _m;
-  waitUntil{_m in magazines _t};
-  _t addWeapon _w;
-  { if(_x!="") then { _t addHandgunItem _x; }; } foreach (_d select 4);
-  if(!_s) then {
-    _t selectWeapon _w;
-    _s = true;  
+_target removeWeapon (handgunWeapon _target);
+_weapon =_data select 3;
+if(_weapon != "") then {
+  _magazine = getArray(configFile>>"CfgWeapons">>_weapon>>"magazines") select 0;
+  _target addMagazine _magazine;
+  waitUntil{_magazine in (magazines _target)};
+  _target addWeapon _weapon;
+  { if(_x!="") then { _target addHandgunItem _x; }; } foreach (_data select 4);
+  if(!_selectedWeapon) then {
+    _target selectWeapon _weapon;
+    _selectedWeapon = true;  
   };
 };
                                        
-_t removeWeapon (secondaryWeapon _t);
-_w = _d select 5;
-if(_w != "") then {
-  _m = getArray(configFile>>"CfgWeapons">>_w>>"magazines") select 0;
-  _t addMagazine _m;
-  waitUntil{_m in magazines _t};
-  _t addWeapon _w;
-  { if(_x!="") then { _t addSecondaryWeaponItem _x; }; } foreach (_d select 6);
-  if(!_s) then {
-    _t selectWeapon _w;
-    _s = true;  
+_target removeWeapon (secondaryWeapon _target);
+_weapon = _data select 5;
+if(_weapon != "") then {
+  _magazine = getArray(configFile>>"CfgWeapons">>_weapon>>"magazines") select 0;
+  _target addMagazine _magazine;
+  waitUntil{_magazine in (magazines _target)};
+  _target addWeapon _weapon;
+  { if(_x!="") then { _target addSecondaryWeaponItem _x; }; } foreach (_data select 6);
+  if(!_selectedWeapon) then {
+    _target selectWeapon _weapon;
+    _selectedWeapon = true;  
   };
 };
 
-removeUniform _t;
-_p = 0;
-if(_d select 7 != "") then {
-  _t addUniform (_d select 7);
-  { [_t,_x] call _add; } foreach (_d select 8);
+removeUniform _target;
+_placeholderCount = 0;
+if(_data select 7 != "") then {
+  _target addUniform (_data select 7);
+  { [_target,_x] call _add; } foreach (_data select 8);
   // fill uniform with placeholders
-  while { loadUniform _t < 1 } do {
-    _t addItem "ItemWatch";
-    _p = _p + 1;
+  while { loadUniform _target < 1 } do {
+    _target addItem "ItemWatch";
+    _placeholderCount = _placeholderCount + 1;
   };
   
 }; 
 
-removeVest _t;
-if(_d select 9 != "") then {
-  _t addVest (_d select 9);
-  { [_t,_x] call _add; } foreach (_d select 10);
+removeVest _target;
+if(_data select 9 != "") then {
+  _target addVest (_data select 9);
+  { [_target,_x] call _add; } foreach (_data select 10);
 };       
 
 _add = {
-  private ["_c","_i"];
-  _c = _this select 0;
-  _i = _this select 1;
-  if(isClass(configFile>>"CfgMagazines">>_i)) then {
-    _c addMagazineCargo [_i,1];
+  private ["_cargo","_item"];
+  _cargo = _this select 0;
+  _item = _this select 1;
+  if(isClass(configFile>>"CfgMagazines">>_item)) then {
+    _cargo addMagazineCargo [_item,1];
   } else {
-    if(getNumber(configFile>>"CfgVehicles">>_i>>"isbackpack")==1) then {
-      _c addBackpackCargo [_i,1];
+    if(getNumber(configFile>>"CfgVehicles">>_item>>"isbackpack")==1) then {
+      _cargo addBackpackCargo [_item,1];
     } else {
-      if(isClass(configFile>>"CfgWeapons">>_i>>"WeaponSlotsInfo")&&getNumber(configFile>>"CfgWeapons">>_i>>"showempty")==1) then {
-        _c addWeaponCargo [_i,1];  
+      if(isClass(configFile>>"CfgWeapons">>_item>>"WeaponSlotsInfo")&&getNumber(configFile>>"CfgWeapons">>_item>>"showempty")==1) then {
+        _cargo addWeaponCargo [_item,1];  
       } else {
-        _c addItemCargo [_i,1];        
+        _cargo addItemCargo [_item,1];        
       };
     };
   };
 };         
 
-removeBackpack _t;
-if(_d select 11!="") then {
-  _t addBackpack (_d select 11);                                                                    
-  _c = unitBackpack _t; 
-  clearWeaponCargo _c;
-  clearMagazineCargo _c;
-  clearItemCargo _c;
-  clearBackpackCargo _c;   
-  { [_c,_x] call _add; } foreach (_d select 12);
+removeBackpack _target;
+if(_data select 11!="") then {
+  _target addBackpack (_data select 11);                                                                    
+  _cargo = unitBackpack _target; 
+  clearWeaponCargo _cargo;
+  clearMagazineCargo _cargo;
+  clearItemCargo _cargo;
+  clearBackpackCargo _cargo;   
+  { [_cargo,_x] call _add; } foreach (_data select 12);
 };
 
 // remove placeholders
-for "_i" from 1 to _p do {
-  _t removeItem "ItemWatch"; 
+for "_i" from 1 to _placeholderCount do {
+  _target removeItem "ItemWatch"; 
 };
 
-removeHeadgear _t;
-if(_d select 13!="") then {
-  _t addHeadgear (_d select 13);
+removeHeadgear _target;
+if(_data select 13!="") then {
+  _target addHeadgear (_data select 13);
 };
 
-removeGoggles _t;
-if(_d select 14!="") then {
-  _t addGoggles (_d select 14);
+removeGoggles _target;
+if(_data select 14!="") then {
+  _target addGoggles (_data select 14);
 };
 
-_t setPos (getPos _t);
+_target setPos (getPos _target);
