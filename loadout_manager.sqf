@@ -192,7 +192,8 @@ switch (_args select 0) do {
     } else {     
       _loadoutName = _loadout select 0;
       hint parseText format["<t size='1' color='#00cc00'>Loading loadout</t>"];      
-      [_target, _loadout select 1] call setLoadout;            
+      [_target, _loadout select 1] spawn setLoadout;
+      loadout = _loadout select 1; // to work with spawn loadout loading                
       hint parseText format["<t size='1' color='#00cc00'>Loaded loadout</t>"];
       //hint parseText format["<t size='1' color='#00cc00'>Loaded</t><br /><br /><t size='6'>%1</t>",_loadoutName];      
     }; 
