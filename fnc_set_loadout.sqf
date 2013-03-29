@@ -2,7 +2,7 @@
 
   AUTHOR: aeroson
   NAME: fnc_set_loadout.sqf
-  VERSION: 2.9
+  VERSION: 3.0
   
   DOWNLOAD & PARTICIPATE:
   https://github.com/aeroson/get-set-loadout
