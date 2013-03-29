@@ -3,7 +3,7 @@
   AUTHOR: aeroson
   NAME: fnc_get_loadout.sqf
   VERSION: 2.1
-
+  
   DOWNLOAD & PARTICIPATE:
   https://github.com/aeroson/get-set-loadout
   http://forums.bistudio.com/showthread.php?148577-GET-SET-Loadout-(saves-and-loads-pretty-much-everything)
@@ -12,55 +12,56 @@
   0 : target unit
   
   RETURNS:
-  Array : array of strings/arrays containing target unit's loadout, to be used by fnc_set_loadout.sqf 
+  Array : array of strings/arrays containing target unit's loadout, to be used by fnc_set_loadout.sqf
+  
   
   addAction support:
   Saves player's loadout into global var loadout
 
 */
 
-private ["_t","_d"];
+private ["_target","_data"];
 
 
 // addAction support
 if(count _this == 1) then {
-  _t = _this select 0;
+  _target = _this select 0;
 } else {
-  _t = player;
+  _target = player;
 };
 
-_d=[
-assignedItems _t,
+_data=[
+assignedItems _target,
 
-primaryWeapon _t,
-primaryWeaponItems _t,
+primaryWeapon _target,
+primaryWeaponItems _target,
 
-handgunWeapon _t,
-handgunItems _t,
+handgunWeapon _target,
+handgunItems _target,
 
-secondaryWeapon _t,
-secondaryWeaponItems _t, 
+secondaryWeapon _target,
+secondaryWeaponItems _target, 
 
-uniform _t,
-uniformItems _t,
+uniform _target,
+uniformItems _target,
 
-vest _t,
-vestItems _t,
+vest _target,
+vestItems _target,
 
-backpack _t, 
-backpackItems _t,
+backpack _target, 
+backpackItems _target,
 
-headgear _t,
-goggles _t
+headgear _target,
+goggles _target
 
 ];
 
 // addAction support
 if(count _this == 1) then {
-  _d;
+  _data;
 } else {  
-  loadout = _d;
+  loadout = _data;
   profileNamespace setVariable ["loadout",loadout];
   saveProfileNamespace;
-  playSound3D ["A3\Sounds_F\sfx\ZoomOut.wav", _t];
+  playSound3D ["A3\Sounds_F\sfx\ZoomOut.wav", _target];
 };   
