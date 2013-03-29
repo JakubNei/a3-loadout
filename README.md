@@ -48,7 +48,7 @@ loadout = [player] call getLoadout;
                                                      
 // Load saved loadout on respawn
 player addEventHandler ["Respawn", {
-    [player,loadout] call setLoadout;
+    [player,loadout] spawn setLoadout;
   }
 ];
 ```
@@ -73,7 +73,7 @@ setLoadout = compile preprocessFileLineNumbers 'fnc_set_loadout.sqf';
 
 // Load saved loadout on respawn
 player addEventHandler ["Respawn", {
-    [player,loadout] call setLoadout;
+    [player,loadout] spawn setLoadout;
   }
 ];
 ```
