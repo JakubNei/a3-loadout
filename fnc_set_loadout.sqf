@@ -18,7 +18,7 @@
   
 */
 
-private ["_target","_data","_selectedWeapon","_weapon","_magazine","_magazine","_placeholderCount"];
+private ["_target","_data","_selectedWeapon","_weapon","_magazine","_muzzles","_magazine","_outfit","_placeholderCount"];
 
 
 // addAction support
@@ -73,23 +73,23 @@ _weapon = _data select 1;
 if(_weapon != "") then {             
   _magazine = getArray(configFile>>"CfgWeapons">>_weapon>>"magazines") select 0;                                               
   _target addMagazine _magazine; // add primary weapon mag    
-  waitUntil{_magazine in (magazines _target)};
-                                                                                                             
-  _magazine = getArray(configFile>>"CfgWeapons">>_weapon>>"muzzles");
+  waitUntil { _magazine in (magazines _target) };
+     
+  _muzzles=getArray(configFile>>"CfgWeapons">>_weapon>>"muzzles");                                                                                                        
   { 
     if (_x != "this") then {
       _magazine = getArray(configFile>>"CfgWeapons">>_weapon>>_x>>"magazines") select 0;
       _target addMagazine _magazine;
-      waitUntil{_magazine in (magazines _target)}; 
+      waitUntil { _magazine in (magazines _target) }; 
     };
-  } forEach _magazine; // add one mag for each muzzle
+  } forEach _muzzles; // add one mag for each muzzle
                 
   _target addWeapon _weapon;                                                                                    
   { if(_x!="") then { _target removeItemFromPrimaryWeapon _x }; } forEach (primaryWeaponItems _target);                                 
   { if(_x!="") then { _target addPrimaryWeaponItem _x; }; } foreach (_data select 2);                             
                                               
-  if (_magazine select 0 != "this") then {                                                                        
-    _weapon = _magazine select 0;                                                                                      
+  if (_muzzles select 0 != "this") then {                                                                        
+    _weapon = _muzzles select 0;                                                                                      
   };                                                                                                        
   _target selectWeapon _weapon;                                                                                       
   _selectedWeapon = true;                                                                                                   
@@ -100,7 +100,7 @@ _weapon =_data select 3;
 if(_weapon != "") then {
   _magazine = getArray(configFile>>"CfgWeapons">>_weapon>>"magazines") select 0;
   _target addMagazine _magazine;
-  waitUntil{_magazine in (magazines _target)};
+  waitUntil { _magazine in (magazines _target) };
   _target addWeapon _weapon;
   { if(_x!="") then { _target addHandgunItem _x; }; } foreach (_data select 4);
   if(!_selectedWeapon) then {
@@ -114,7 +114,7 @@ _weapon = _data select 5;
 if(_weapon != "") then {
   _magazine = getArray(configFile>>"CfgWeapons">>_weapon>>"magazines") select 0;
   _target addMagazine _magazine;
-  waitUntil{_magazine in (magazines _target)};
+  waitUntil { _magazine in (magazines _target) };
   _target addWeapon _weapon;
   { if(_x!="") then { _target addSecondaryWeaponItem _x; }; } foreach (_data select 6);
   if(!_selectedWeapon) then {
@@ -125,8 +125,10 @@ if(_weapon != "") then {
 
 removeUniform _target;
 _placeholderCount = 0;
-if(_data select 7 != "") then {
-  _target addUniform (_data select 7);
+_outfit = _data select 7;  
+if(_outfit != "") then {
+  _target addUniform _outfit;
+  waitUntil { uniform _target == _outfit };
   { [_target,_x] call _add; } foreach (_data select 8);
   // fill uniform with placeholders
   while { loadUniform _target < 1 } do {
@@ -137,8 +139,10 @@ if(_data select 7 != "") then {
 }; 
 
 removeVest _target;
-if(_data select 9 != "") then {
-  _target addVest (_data select 9);
+_outfit = _data select 9; 
+if(_outfit != "") then {
+  _target addVest _outfit;
+  waitUntil { vest _target == _outfit };
   { [_target,_x] call _add; } foreach (_data select 10);
 };       
 
@@ -162,8 +166,10 @@ _add = {
 };         
 
 removeBackpack _target;
-if(_data select 11!="") then {
-  _target addBackpack (_data select 11);                                                                    
+_outfit = _data select 11; 
+if(_outfit != "") then {
+  _target addBackpack _outfit;
+  waitUntil { backpack _target == _outfit };                                                                    
   _cargo = unitBackpack _target; 
   clearWeaponCargo _cargo;
   clearMagazineCargo _cargo;
