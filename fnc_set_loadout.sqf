@@ -41,22 +41,18 @@ _placeholderCount = 0;
 _selectedWeapon = false; // did we already do selectWeapon ?
 
 _add = {
-  private ["_cargo","_item"];
-  _cargo = _this select 0;
-  _item = _this select 1;
-  if(isClass(configFile>>"CfgMagazines">>_item)) then {
-    _cargo addMagazine _item;
-  } else {
-    if(getNumber(configFile>>"CfgVehicles">>_item>>"isbackpack")==1) then {
-      _cargo addBackpack _item;
-    } else {
-      if(isClass(configFile>>"CfgWeapons">>_item>>"WeaponSlotsInfo")&&getNumber(configFile>>"CfgWeapons">>_item>>"showempty")==1) then {
-        _cargo addWeapon _item;  
-      } else {
-        _cargo addItem _item;        
-      };
-    };
-  };
+	private ["_cargo","_item"];
+	_cargo = _this select 0;
+	_item = _this select 1;
+	if(isClass(configFile>>"CfgMagazines">>_item)) then {
+		_cargo addMagazine _item;
+	} else {
+		if(isClass(configFile>>"CfgWeapons">>_item>>"WeaponSlotsInfo")&&getNumber(configFile>>"CfgWeapons">>_item>>"showempty")==1) then {
+			_cargo addWeapon _item;  
+		} else {
+			_cargo addItem _item;        
+		};
+	};
 };
 
 // we need to add items somewhere before we can assign them
