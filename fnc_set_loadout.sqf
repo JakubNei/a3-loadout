@@ -1,20 +1,20 @@
 /*
 
-  AUTHOR: aeroson
-  NAME: fnc_set_loadout.sqf
-  VERSION: 3.2
-  
-  DOWNLOAD & PARTICIPATE:
-  https://github.com/aeroson/get-set-loadout
-  http://forums.bistudio.com/showthread.php?148577-GET-SET-Loadout-(saves-and-loads-pretty-much-everything)
-  
-  PARAMETER(S):
-  0 : target unit
-  1 : array of strings/arrays containing desired target unit's loadout, obtained from fnc_get_loadout.sqf
-  
-  
-  addAction support:
-  Sets player's loadout from global var loadout
+	AUTHOR: aeroson
+	NAME: fnc_set_loadout.sqf
+	VERSION: 3.2
+	
+	DOWNLOAD & PARTICIPATE:
+	https://github.com/aeroson/get-set-loadout
+	http://forums.bistudio.com/showthread.php?148577-GET-SET-Loadout-(saves-and-loads-pretty-much-everything)
+	
+	PARAMETER(S):
+	0 : target unit
+	1 : array of strings/arrays containing desired target unit's loadout, obtained from fnc_get_loadout.sqf
+	
+	
+	addAction support:
+	Sets player's loadout from global var loadout
   
 */
 
@@ -41,16 +41,16 @@ _placeholderCount = 0;
 _selectedWeapon = false; // did we already do selectWeapon ?
 
 _add = {
-	private ["_cargo","_item"];
-	_cargo = _this select 0;
+	private ["_target","_item"];
+	_target = _this select 0;
 	_item = _this select 1;
 	if(isClass(configFile>>"CfgMagazines">>_item)) then {
-		_cargo addMagazine _item;
+		_target addMagazine _item;
 	} else {
 		if(isClass(configFile>>"CfgWeapons">>_item>>"WeaponSlotsInfo") AND getNumber(configFile>>"CfgWeapons">>_item>>"showempty")==1) then {
-			_cargo addWeapon _item;  
+			_target addWeapon _item;  
 		} else {
-			_cargo addItem _item;        
+			_target addItem _item;        
 		};
 	};
 };
@@ -152,13 +152,32 @@ if(_outfit != "") then {
 	};
 };       
 
+_add = {
+	private ["_target","_item"];
+	_target = _this select 0;
+	_item = _this select 1;
+	if(isClass(configFile>>"CfgMagazines">>_item)) then {
+		(unitBackpack _target) addMagazineCargo [_item,1];
+		} else {
+			if(getNumber(configFile>>"CfgVehicles">>_item>>"isbackpack")==1) then {
+			_target addMagazine _item;
+			} else {
+			if(isClass(configFile>>"CfgWeapons">>_item>>"WeaponSlotsInfo")&&getNumber(configFile>>"CfgWeapons">>_item>>"showempty")==1) then {
+				(unitBackpack _target) addWeaponCargo [_item,1];  
+			} else {
+				_target addItem _item;         
+			};
+		};
+	};
+};     
+
 removeBackpack _target;
 _outfit = _data select 11; 
 if(_outfit != "") then {
 	_target addBackpack _outfit;
 	waitUntil { backpack _target == _outfit };                                                                    
 	clearAllItemsFromBackpack _target;
-	{ [_target,_x] call _add; } foreach (_data select 12);
+	{ [_target ,_x] call _add; } foreach (_data select 12);
 };
 
 // remove placeholders
