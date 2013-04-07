@@ -49,10 +49,7 @@ vest _target,
 vestItems _target,
 
 backpack _target, 
-backpackItems _target,
-
-headgear _target,
-goggles _target
+backpackItems _target
 
 ];
 

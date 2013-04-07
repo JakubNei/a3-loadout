@@ -162,14 +162,4 @@ for "_i" from 1 to _placeholderCount do {
   _target removeItem "ItemWatch"; 
 };
 
-removeHeadgear _target;
-if(_data select 13!="") then {
-  _target addHeadgear (_data select 13);
-};
-
-removeGoggles _target;
-if(_data select 14!="") then {
-  _target addGoggles (_data select 14);
-};
-
 _target setPos (getPos _target);
