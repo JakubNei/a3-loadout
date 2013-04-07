@@ -153,11 +153,7 @@ _outfit = _data select 11;
 if(_outfit != "") then {
   _target addBackpack _outfit;
   waitUntil { backpack _target == _outfit };                                                                    
-  _outfit = unitBackpack _target; 
-  clearWeaponCargo _outfit;
-  clearMagazineCargo _outfit;
-  clearItemCargo _outfit;
-  clearBackpackCargo _outfit;   
+  clearAllItemsFromBackpack _target;
   { [_target,_x] call _add; } foreach (_data select 12);
 };
 
