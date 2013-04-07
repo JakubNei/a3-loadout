@@ -75,7 +75,7 @@ if(_weapon != "") then {
 	
 	// add one mag for each muzzle
 	{ 
-		if (_x != _weapon) then {
+		if (_x != "this") then {
 			_magazine = getArray(configFile>>"CfgWeapons">>_weapon>>_x>>"magazines") select 0;
 			_target addMagazine _magazine;
 			waitUntil { _magazine in (magazines _target) }; 
@@ -84,9 +84,13 @@ if(_weapon != "") then {
 				
 	_target addWeapon _weapon;                                                                                    
 	{ if(_x!="") then { _target removeItemFromPrimaryWeapon _x }; } forEach (primaryWeaponItems _target);                                 
-	{ if(_x!="") then { _target addPrimaryWeaponItem _x; }; } foreach (_data select 2);
+	{ if(_x!="") then { _target addPrimaryWeaponItem _x; }; } foreach (_data select 2);                             
+											  
+	if (_muzzles select 0 != "this") then {                                                                        
+		_weapon = _muzzles select 0;                                                                                      
+	};
 	
-	_target selectWeapon (_muzzles select 0);                                                                                     
+	_target selectWeapon _weapon;                                                                                       
 	_selectedWeapon = true;                                                                                                   
 };
 
