@@ -25,40 +25,39 @@ private ["_target","_data"];
 
 // addAction support
 if(count _this == 1) then {
-  _target = _this select 0;
+	_target = _this select 0;
 } else {
-  _target = player;
+	_target = player;
 };
 
 _data=[
-assignedItems _target,
+	assignedItems _target,
 
-primaryWeapon _target,
-primaryWeaponItems _target,
+	primaryWeapon _target,
+	primaryWeaponItems _target,
 
-handgunWeapon _target,
-handgunItems _target,
+	handgunWeapon _target,
+	handgunItems _target,
 
-secondaryWeapon _target,
-secondaryWeaponItems _target, 
+	secondaryWeapon _target,
+	secondaryWeaponItems _target, 
 
-uniform _target,
-uniformItems _target,
+	uniform _target,
+	uniformItems _target,
 
-vest _target,
-vestItems _target,
+	vest _target,
+	vestItems _target,
 
-backpack _target, 
-backpackItems _target
-
+	backpack _target, 
+	backpackItems _target
 ];
 
 // addAction support
 if(count _this == 1) then {
-  _data;
+	_data;
 } else {  
-  loadout = _data;
-  profileNamespace setVariable ["loadout",loadout];
-  saveProfileNamespace;
-  playSound3D ["A3\Sounds_F\sfx\ZoomOut.wav", _target];
+	loadout = _data;
+	profileNamespace setVariable ["loadout",loadout];
+	saveProfileNamespace;
+	playSound3D ["A3\Sounds_F\sfx\ZoomOut.wav", _target];
 };   
