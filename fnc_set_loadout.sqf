@@ -2,7 +2,7 @@
 
   AUTHOR: aeroson
   NAME: fnc_set_loadout.sqf
-  VERSION: 3.1
+  VERSION: 3.2
   
   DOWNLOAD & PARTICIPATE:
   https://github.com/aeroson/get-set-loadout
@@ -31,7 +31,7 @@ if(count _this == 2) then {
 	playSound3D ["A3\Sounds_F\sfx\ZoomIn.wav", _target];  
 };
 
-if(count _data != 15) exitWith {
+if(count _data < 13) exitWith {
 	if(_target == player) then {
 		hint "You were trying to set/load corrupted loadout";
 	};
