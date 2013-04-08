@@ -1,25 +1,25 @@
 /*
 
-	AUTHOR: aeroson
-	NAME: fnc_set_loadout.sqf
-	VERSION: 3.2
-	
-	DOWNLOAD & PARTICIPATE:
-	https://github.com/aeroson/get-set-loadout
-	http://forums.bistudio.com/showthread.php?148577-GET-SET-Loadout-(saves-and-loads-pretty-much-everything)
-	
-	PARAMETER(S):
-	0 : target unit
-	1 : array of strings/arrays containing desired target unit's loadout, obtained from fnc_get_loadout.sqf
-	
-	
-	addAction support:
-	Sets player's loadout from global var loadout
+  AUTHOR: aeroson
+  NAME: fnc_set_loadout.sqf
+  VERSION: 3.3
+  
+  DOWNLOAD & PARTICIPATE:
+  https://github.com/aeroson/get-set-loadout
+  http://forums.bistudio.com/showthread.php?148577-GET-SET-Loadout-(saves-and-loads-pretty-much-everything)
+  
+  PARAMETER(S):
+  0 : target unit
+  1 : array of strings/arrays containing desired target unit's loadout, obtained from fnc_get_loadout.sqf
+  
+  
+  addAction support:
+  Sets player's loadout from global var loadout
   
 */
 
-private ["_target","_data","_selectedWeapon","_weapon","_magazine","_muzzles","_magazine","_outfit","_placeholderCount"];
 
+private ["_target","_data","_selectedWeapon","_weapon","_magazine","_muzzles","_outfit","_placeholderCount"];
 
 // addAction support
 if(count _this == 2) then {
@@ -67,18 +67,16 @@ removeAllAssignedItems _target;
 _target removeWeapon (primaryWeapon _target);
 _weapon = _data select 1;             
 if(_weapon != "") then {             
-	_magazine = getArray(configFile>> "CfgWeapons">>_weapon>>"magazines") select 0;                                               
-	_target addMagazine _magazine; // add primary weapon mag    
-	waitUntil { _magazine in (magazines _target) };
-	 
-	_muzzles = getArray(configFile>>"CfgWeapons">>_weapon>> "muzzles");   
-	
-	// add one mag for each muzzle
-	{ 
+	_magazine = toLower(getArray(configFile>>"CfgWeapons">>_weapon>>"magazines") select 0);                                               
+	_target addMagazine _magazine; // add primary weapon mag
+	a = _magazine;
+	waitUntil { {_magazine == toLower(_x) } count (magazines _target) > 0 };  
+	_muzzles = getArray(configFile>>"CfgWeapons">>_weapon>>"muzzles"); 	
+	{ // add one mag for each muzzle
 		if (_x != "this") then {
-			_magazine = getArray(configFile>>"CfgWeapons">>_weapon>>_x>>"magazines") select 0;
+			_magazine = toLower(getArray(configFile>>"CfgWeapons">>_weapon>>_x>>"magazines") select 0);
 			_target addMagazine _magazine;
-			waitUntil { _magazine in (magazines _target) }; 
+			waitUntil { {_magazine == toLower(_x) } count (magazines _target) > 0 };
 		};
 	} forEach _muzzles; 
 				
@@ -97,9 +95,9 @@ if(_weapon != "") then {
 _target removeWeapon (handgunWeapon _target);
 _weapon =_data select 3;
 if(_weapon != "") then {
-	_magazine = getArray(configFile>>"CfgWeapons">>_weapon>>"magazines") select 0;
+	_magazine = toLower(getArray(configFile>>"CfgWeapons">>_weapon>>"magazines") select 0);
 	_target addMagazine _magazine;
-	waitUntil { _magazine in (magazines _target) };
+	waitUntil { {_magazine == toLower(_x) } count (magazines _target) > 0 };
 	
 	_target addWeapon _weapon;
 	{ if(_x!="") then { _target addHandgunItem _x; }; } foreach (_data select 4);
@@ -113,9 +111,9 @@ if(_weapon != "") then {
 _target removeWeapon (secondaryWeapon _target);
 _weapon = _data select 5;
 if(_weapon != "") then {
-	_magazine = getArray(configFile>>"CfgWeapons">>_weapon>>"magazines") select 0;
+	_magazine = toLower(getArray(configFile>>"CfgWeapons">>_weapon>>"magazines") select 0);
 	_target addMagazine _magazine;
-	waitUntil { _magazine in (magazines _target) };
+	waitUntil { {_magazine == toLower(_x) } count (magazines _target) > 0 };
 	
 	_target addWeapon _weapon;
 	{ if(_x!="") then { _target addSecondaryWeaponItem _x; }; } foreach (_data select 6);
@@ -145,10 +143,11 @@ if(_outfit != "") then {
 	_target addVest _outfit;
 	waitUntil { vest _target == _outfit };
 	{ [_target,_x] call _add; } foreach (_data select 10);
-
-	while { loadVest _target < 1 } do {
-		_target addItem "ItemWatch";
-		_placeholderCount = _placeholderCount + 1;
+	if(getText(configFile>>"CfgWeapons">>_outfit>>"ItemInfo">>"containerclass")!="Supply0") then { // fix for rebreather having no space
+		while { loadVest _target < 1 } do {
+			_target addItem "ItemWatch";
+			_placeholderCount = _placeholderCount + 1;
+		};
 	};
 };       
 
@@ -157,13 +156,13 @@ _add = {
 	_target = _this select 0;
 	_item = _this select 1;
 	if(isClass(configFile>>"CfgMagazines">>_item)) then {
-		(unitBackpack _target) addMagazineCargo [_item,1];
+		unitBackpack _target addMagazineCargo [_item,1];
 		} else {
 			if(getNumber(configFile>>"CfgVehicles">>_item>>"isbackpack")==1) then {
 			_target addMagazine _item;
 			} else {
 			if(isClass(configFile>>"CfgWeapons">>_item>>"WeaponSlotsInfo")&&getNumber(configFile>>"CfgWeapons">>_item>>"showempty")==1) then {
-				(unitBackpack _target) addWeaponCargo [_item,1];  
+				unitBackpack _target addWeaponCargo [_item,1];  
 			} else {
 				_target addItem _item;         
 			};
@@ -177,7 +176,7 @@ if(_outfit != "") then {
 	_target addBackpack _outfit;
 	waitUntil { backpack _target == _outfit };                                                                    
 	clearAllItemsFromBackpack _target;
-	{ [_target ,_x] call _add; } foreach (_data select 12);
+	{ [_target, _x] call _add; } foreach (_data select 12);
 };
 
 // remove placeholders
