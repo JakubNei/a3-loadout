@@ -81,11 +81,12 @@ _target removeWeapon (primaryWeapon _target);
 _weapon = _data select 1;             
 if(_weapon != "") then {
 
+	_muzzles = getArray(configFile>>"CfgWeapons">>_weapon>>"muzzles"); 
+
 	if(count _loadedMagazines > 0) then {
 		_magazines = _loadedMagazines select 0; // get loaded magazines from saved loadout
 	} else {          
-		_magazines = [toLower(getArray(configFile>>"CfgWeapons">>_weapon>>"magazines") select 0)]; // generate default magazines
-		_muzzles = getArray(configFile>>"CfgWeapons">>_weapon>>"muzzles"); 	
+		_magazines = [toLower(getArray(configFile>>"CfgWeapons">>_weapon>>"magazines") select 0)]; // generate default magazines	
 		{
 			if (_x != "this") then {
 				_magazines set [count _magazines, toLower(getArray(configFile>>"CfgWeapons">>_weapon>>_x>>"magazines") select 0)];
@@ -105,7 +106,7 @@ if(_weapon != "") then {
 	{ if(_x!="") then { _target removeItemFromPrimaryWeapon _x }; } forEach (primaryWeaponItems _target);                                 
 	{ if(_x!="") then { _target addPrimaryWeaponItem _x; }; } foreach (_data select 2);                             
 											  
-	if (_muzzles select 0 != "this") then {                                                                        
+	if (count _muzzles > 1) then {                                                                        
 		_weapon = _muzzles select 0;                                                                                      
 	};
 	
@@ -161,10 +162,7 @@ if(_weapon != "") then {
 
 
 if(count _data > 14) then {
-	_weapon = _data select 14;
-	if(_target hasWeapon _weapon) then {
-		_target selectWeapon _weapon;
-	};
+	_target selectWeapon (_data select 14);
 };
 
 
