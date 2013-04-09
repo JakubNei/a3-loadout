@@ -31,7 +31,7 @@ if(count _this == 1) then {
 };
 
 
-_currentWeapon = currentWeapon _target;
+_currentWeapon = currentMuzzle  _target;
 
 _loadedMagazines = [];
 
