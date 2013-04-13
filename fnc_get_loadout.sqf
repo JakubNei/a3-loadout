@@ -2,7 +2,7 @@
 
 	AUTHOR: aeroson
 	NAME: fnc_get_loadout.sqf
-	VERSION: 2.2
+	VERSION: 2.3
 	
 	DOWNLOAD & PARTICIPATE:
 	https://github.com/aeroson/get-set-loadout
@@ -10,6 +10,7 @@
 	
 	PARAMETER(S):
 	0 : target unit
+	1 : optional, if count _this == 2 then it wont save currently loaded magazine, current method does reset your firing mode
 	
 	RETURNS:
 	Array : array of strings/arrays containing target unit's loadout, to be used by fnc_set_loadout.sqf
@@ -24,51 +25,50 @@
 private ["_target","_weapon","_magazine","_magazines","_muzzles","_currentWeapon","_loadedMagazines","_data"];
 
 // addAction support
-if(count _this == 1) then {
+if(count _this < 3) then {
 	_target = _this select 0;
 } else {
 	_target = player;
-};
+};                         
 
-
-_currentWeapon = currentMuzzle  _target;
-
-_loadedMagazines = [];
-
-_magazines = [];
-_weapon = primaryWeapon _target; 
-if(_weapon != "") then {
-	_target selectWeapon _weapon;
-	_magazines = [toLower(currentMagazine _target)];
-	_muzzles = getArray(configFile>>"CfgWeapons">>_weapon>>"muzzles"); 	
-	{ // add one mag for each muzzle
-		if (_x != "this") then {
-			_target selectWeapon _x;
-			_magazines set [count _magazines, toLower(currentMagazine _target)];
-		};
-	} forEach _muzzles;		
-};
-_loadedMagazines set [count _loadedMagazines, _magazines];
-
-_magazine = "";
-_weapon = handgunWeapon player;
-if(_weapon != "") then {
-	_target selectWeapon _weapon;
-	_magazine = currentMagazine _target;
-};
-_loadedMagazines set [count _loadedMagazines, _magazine];
+if(count _this == 2) then {	
+	_currentWeapon = currentMuzzle  _target;	
+	_loadedMagazines = [];
 	
-_magazine = "";
-_weapon = secondaryWeapon _target;
-if(_weapon != "") then {
-	_target selectWeapon _weapon;
-	_magazine = currentMagazine _target;
+	_magazines = [];
+	_weapon = primaryWeapon _target; 
+	if(_weapon != "") then {
+		_target selectWeapon _weapon;
+		_magazines = [toLower(currentMagazine _target)];
+		_muzzles = getArray(configFile>>"CfgWeapons">>_weapon>>"muzzles"); 	
+		{ // add one mag for each muzzle
+			if (_x != "this") then {
+				_target selectWeapon _x;
+				_magazines set [count _magazines, toLower(currentMagazine _target)];
+			};
+		} forEach _muzzles;		
+	};
+	_loadedMagazines set [count _loadedMagazines, _magazines];
+	
+	_magazine = "";
+	_weapon = handgunWeapon player;
+	if(_weapon != "") then {
+		_target selectWeapon _weapon;
+		_magazine = currentMagazine _target;
+	};
+	_loadedMagazines set [count _loadedMagazines, _magazine];
+		
+	_magazine = "";
+	_weapon = secondaryWeapon _target;
+	if(_weapon != "") then {
+		_target selectWeapon _weapon;
+		_magazine = currentMagazine _target;
+	};
+	_loadedMagazines set [count _loadedMagazines, _magazine];
+	
+	_target selectWeapon _currentWeapon;	
 };
-_loadedMagazines set [count _loadedMagazines, _magazine];
-
-_target selectWeapon _currentWeapon;
-
-
+	
 _data=[
 	assignedItems _target, //0
 
@@ -88,14 +88,17 @@ _data=[
 	vestItems _target, //10
 
 	backpack _target, //11 
-	backpackItems _target, //12
-	
-	_loadedMagazines, //13 (optional)
-	_currentWeapon //14 (optional)
+	backpackItems _target //12
 ];
 
+
+if(count _this == 2) then {
+	_data set [13, _loadedMagazines]; //13 (optional)
+	_data set [14, _currentWeapon]; //14 (optional)
+};
+
 // addAction support
-if(count _this == 1) then {
+if(count _this < 3) then {
 	_data;
 } else {  
 	loadout = _data;
