@@ -31,7 +31,7 @@ if(count _this < 3) then {
 	_target = player;
 };                         
 
-if(count _this == 2) then {	
+if(count _this != 2) then {	
 	_currentWeapon = currentMuzzle  _target;	
 	_loadedMagazines = [];
 	
@@ -92,7 +92,7 @@ _data=[
 ];
 
 
-if(count _this == 2) then {
+if(count _this != 2) then {
 	_data set [13, _loadedMagazines]; //13 (optional)
 	_data set [14, _currentWeapon]; //14 (optional)
 };
