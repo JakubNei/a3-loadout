@@ -2,7 +2,7 @@
 
 	AUTHOR: aeroson
 	NAME: fnc_get_loadout.sqf
-	VERSION: 2.3
+	VERSION: 2.4
 	
 	DOWNLOAD & PARTICIPATE:
 	https://github.com/aeroson/get-set-loadout
@@ -22,7 +22,7 @@
 */
 
 
-private ["_target","_weapon","_magazine","_magazines","_muzzles","_currentWeapon","_loadedMagazines","_data"];
+private ["_target","_weapon","_magazine","_magazines","_muzzles","_currentWeapon","_currentMode","_loadedMagazines","_data"];
 
 // addAction support
 if(count _this < 3) then {
@@ -31,43 +31,51 @@ if(count _this < 3) then {
 	_target = player;
 };                         
 
-if(count _this != 2) then {	
-	_currentWeapon = currentMuzzle  _target;	
-	_loadedMagazines = [];
-	
-	_magazines = [];
-	_weapon = primaryWeapon _target; 
-	if(_weapon != "") then {
-		_target selectWeapon _weapon;
-		_magazines = [toLower(currentMagazine _target)];
-		_muzzles = getArray(configFile>>"CfgWeapons">>_weapon>>"muzzles"); 	
-		{ // add one mag for each muzzle
-			if (_x != "this") then {
-				_target selectWeapon _x;
-				_magazines set [count _magazines, toLower(currentMagazine _target)];
-			};
-		} forEach _muzzles;		
-	};
-	_loadedMagazines set [count _loadedMagazines, _magazines];
-	
-	_magazine = "";
-	_weapon = handgunWeapon player;
-	if(_weapon != "") then {
-		_target selectWeapon _weapon;
-		_magazine = currentMagazine _target;
-	};
-	_loadedMagazines set [count _loadedMagazines, _magazine];
-		
-	_magazine = "";
-	_weapon = secondaryWeapon _target;
-	if(_weapon != "") then {
-		_target selectWeapon _weapon;
-		_magazine = currentMagazine _target;
-	};
-	_loadedMagazines set [count _loadedMagazines, _magazine];
-	
-	_target selectWeapon _currentWeapon;	
+
+_currentWeapon = currentMuzzle  _target;
+_currentMode = currentWeaponMode _target;	
+_loadedMagazines = [];
+
+
+_magazines = [];
+_weapon = primaryWeapon _target; 
+if(_weapon != "") then {
+	_target selectWeapon _weapon;
+	_magazines = [toLower(currentMagazine _target)];
+	_muzzles = getArray(configFile>>"CfgWeapons">>_weapon>>"muzzles"); 	
+	{ // add one mag for each muzzle
+		if (_x != "this") then {
+			_target selectWeapon _x;
+			_magazines set [count _magazines, toLower(currentMagazine _target)];
+		};
+	} forEach _muzzles;		
 };
+_loadedMagazines set [count _loadedMagazines, _magazines];
+
+_magazine = "";
+_weapon = handgunWeapon player;
+if(_weapon != "") then {
+	_target selectWeapon _weapon;
+	_magazine = currentMagazine _target;
+};
+_loadedMagazines set [count _loadedMagazines, _magazine];
+	
+_magazine = "";
+_weapon = secondaryWeapon _target;
+if(_weapon != "") then {
+	_target selectWeapon _weapon;
+	_magazine = currentMagazine _target;
+};
+_loadedMagazines set [count _loadedMagazines, _magazine];
+
+_target selectWeapon _currentWeapon;
+
+_muzzles = 0;
+while { _currentMode != currentWeaponMode _target } do {
+	_target action ["SWITCHWEAPON", _target, _target, _muzzles];
+	_muzzles = _muzzles + 1;
+};
+
 	
 _data=[
 	assignedItems _target, //0
@@ -88,14 +96,12 @@ _data=[
 	vestItems _target, //10
 
 	backpack _target, //11 
-	backpackItems _target //12
+	backpackItems _target, //12
+
+	_loadedMagazines, //13 (optional)
+	_currentWeapon, //14 (optional)
+	_currentMode //15 (optional)
 ];
-
-
-if(count _this != 2) then {
-	_data set [13, _loadedMagazines]; //13 (optional)
-	_data set [14, _currentWeapon]; //14 (optional)
-};
 
 // addAction support
 if(count _this < 3) then {
