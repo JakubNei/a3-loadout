@@ -1,20 +1,20 @@
 /*
 
-  AUTHOR: aeroson
-  NAME: fnc_set_loadout.sqf
-  VERSION: 3.4
-  
-  DOWNLOAD & PARTICIPATE:
-  https://github.com/aeroson/get-set-loadout
-  http://forums.bistudio.com/showthread.php?148577-GET-SET-Loadout-(saves-and-loads-pretty-much-everything)
-  
-  PARAMETER(S):
-  0 : target unit
-  1 : array of strings/arrays containing desired target unit's loadout, obtained from fnc_get_loadout.sqf
-  
-  
-  addAction support:
-  Sets player's loadout from global var loadout
+	AUTHOR: aeroson
+	NAME: fnc_set_loadout.sqf
+	VERSION: 3.5
+	
+	DOWNLOAD & PARTICIPATE:
+	https://github.com/aeroson/get-set-loadout
+	http://forums.bistudio.com/showthread.php?148577-GET-SET-Loadout-(saves-and-loads-pretty-much-everything)
+	
+	PARAMETER(S):
+	0 : target unit
+	1 : array of strings/arrays containing desired target unit's loadout, obtained from fnc_get_loadout.sqf
+	
+	
+	addAction support:
+	Sets player's loadout from global var loadout
   
 */
 
@@ -163,7 +163,17 @@ if(_weapon != "") then {
 
 if(count _data > 14) then {
 	_target selectWeapon (_data select 14);
+	if(count _data > 15) then {
+		_muzzles = 0;
+		_weapon = _data select 15;
+		while { _weapon != currentWeaponMode _target } do {
+			_target action ["SWITCHWEAPON", _target, _target, _muzzles];
+			_muzzles = _muzzles + 1;
+		};
+	};
 };
+
+
 
 
 _outfit = _data select 7;  
