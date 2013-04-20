@@ -10,7 +10,6 @@
 	
 	PARAMETER(S):
 	0 : target unit
-	1 : optional, if count _this == 2 then it wont save currently loaded magazine, current method does reset your firing mode
 	
 	RETURNS:
 	Array : array of strings/arrays containing target unit's loadout, to be used by fnc_set_loadout.sqf
