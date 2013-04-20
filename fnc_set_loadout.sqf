@@ -2,7 +2,7 @@
 
 	AUTHOR: aeroson
 	NAME: fnc_set_loadout.sqf
-	VERSION: 3.5
+	VERSION: 3.6
 	
 	DOWNLOAD & PARTICIPATE:
 	https://github.com/aeroson/get-set-loadout
@@ -19,7 +19,7 @@
 */
 
 
-private ["_target","_data","_loadedMagazines","_selectedWeapon","_weapon","_magazine","_magazines","_muzzles","_outfit","_placeholderCount"];
+private ["_target","_data","_loadedMagazines","_currentWeapon","_currentMode","_weapon","_magazine","_magazines","_muzzles","_outfit","_placeholderCount"];
 
 // addAction support
 if(count _this == 2) then {
@@ -79,8 +79,7 @@ removeAllAssignedItems _target;
 
 _target removeWeapon (primaryWeapon _target);
 _weapon = _data select 1;             
-if(_weapon != "") then {
-
+if(_weapon != "") then { 
 	_muzzles = getArray(configFile>>"CfgWeapons">>_weapon>>"muzzles"); 
 
 	if(count _loadedMagazines > 0) then {
@@ -104,14 +103,7 @@ if(_weapon != "") then {
 							
 	_target addWeapon _weapon;                                                                                    
 	{ if(_x!="") then { _target removeItemFromPrimaryWeapon _x }; } forEach (primaryWeaponItems _target);                                 
-	{ if(_x!="") then { _target addPrimaryWeaponItem _x; }; } foreach (_data select 2);                             
-											  
-	if (count _muzzles > 1) then {                                                                        
-		_weapon = _muzzles select 0;                                                                                      
-	};
-	
-	_target selectWeapon _weapon;                                                                                       
-	_selectedWeapon = true;                                                                                                   
+	{ if(_x!="") then { _target addPrimaryWeaponItem _x; }; } foreach (_data select 2);                             											                                                                                               
 };
 
 
@@ -130,11 +122,6 @@ if(_weapon != "") then {
 	
 	_target addWeapon _weapon;
 	{ if(_x!="") then { _target addHandgunItem _x; }; } foreach (_data select 4);
-	
-	if(!_selectedWeapon) then {
-		_target selectWeapon _weapon;
-		_selectedWeapon = true;  
-	};
 };
       
 			                                 
@@ -153,27 +140,24 @@ if(_weapon != "") then {
 	
 	_target addWeapon _weapon;
 	{ if(_x!="") then { _target addSecondaryWeaponItem _x; }; } foreach (_data select 6);
-	
-	if(!_selectedWeapon) then {
-		_target selectWeapon _weapon;
-		_selectedWeapon = true;  
-	};
 };
 
 
 if(count _data > 14) then {
-	_target selectWeapon (_data select 14);
+	_currentWeapon = _data select 14; 
+	_currentMode = "Single";
 	if(count _data > 15) then {
+		_currentMode = _data select 15;
+	};
+	if ( _currentWeapon != "" && _currentMode != "" ) then {
 		_muzzles = 0;
-		_weapon = _data select 15;
-		while { _weapon != currentWeaponMode _target } do {
+		while { (_currentWeapon != currentMuzzle _target || _currentMode != currentWeaponMode _target ) && _muzzles < 200 } do {
 			_target action ["SWITCHWEAPON", _target, _target, _muzzles];
 			_muzzles = _muzzles + 1;
 		};
 	};
+	_target switchMove "";
 };
-
-
 
 
 _outfit = _data select 7;  
