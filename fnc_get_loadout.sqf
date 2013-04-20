@@ -2,7 +2,7 @@
 
 	AUTHOR: aeroson
 	NAME: fnc_get_loadout.sqf
-	VERSION: 2.4
+	VERSION: 2.5
 	
 	DOWNLOAD & PARTICIPATE:
 	https://github.com/aeroson/get-set-loadout
@@ -32,7 +32,7 @@ if(count _this < 3) then {
 };                         
 
 
-_currentWeapon = currentMuzzle  _target;
+_currentWeapon = currentMuzzle _target;
 _currentMode = currentWeaponMode _target;	
 _loadedMagazines = [];
 
@@ -68,12 +68,12 @@ if(_weapon != "") then {
 };
 _loadedMagazines set [count _loadedMagazines, _magazine];
 
-_target selectWeapon _currentWeapon;
-
-_muzzles = 0;
-while { _currentMode != currentWeaponMode _target } do {
-	_target action ["SWITCHWEAPON", _target, _target, _muzzles];
-	_muzzles = _muzzles + 1;
+if ( _currentWeapon != "" && _currentMode != "" ) then {
+	_muzzles = 0;
+	while { (_currentWeapon != currentMuzzle _target || _currentMode != currentWeaponMode _target ) && _muzzles < 200 } do {
+		_target action ["SWITCHWEAPON", _target, _target, _muzzles];
+		_muzzles = _muzzles + 1;
+	};
 };
 
 	
