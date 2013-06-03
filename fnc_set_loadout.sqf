@@ -34,6 +34,7 @@ if(count _this < 4) then {
 	_data = loadout;
 	//playSound3D ["A3\Sounds_F\sfx\ZoomIn.wav", _target]; 
 };
+a=_data;
 
 if(count _data < 13) exitWith {
 	if(_target == player) then {
@@ -64,20 +65,24 @@ _add = {
 	private ["_target","_item"];
 	_target = _this select 0;
 	_item = _this select 1;
-	if(typename _item=="ARRAY") then {
-		if(_loadMagsAmmo) then {
-			_target addMagazine _item;
-		} else {
-			_target addMagazine (_item select 0);
+	if(typename _item == "ARRAY") then {
+		if(_item select 0 != "") then {
+			if(_loadMagsAmmo) then {
+				_target addMagazine _item;
+			} else {
+				_target addMagazine (_item select 0);
+			};
 		};
 	} else {
-		if(isClass(configFile>>"CfgMagazines">>_item)) then {
-			_target addMagazine _item;
-		} else {
-			if(isClass(configFile>>"CfgWeapons">>_item>>"WeaponSlotsInfo") && getNumber(configFile>>"CfgWeapons">>_item>>"showempty")==1) then {
-				_target addWeapon _item;  
+		if(_item != "") then {
+			if(isClass(configFile>>"CfgMagazines">>_item)) then {
+				_target addMagazine _item;
 			} else {
-				_target addItem _item;        
+				if(isClass(configFile>>"CfgWeapons">>_item>>"WeaponSlotsInfo") && getNumber(configFile>>"CfgWeapons">>_item>>"showempty")==1) then {
+					_target addWeapon _item;  
+				} else {
+					_target addItem _item;        
+				};
 			};
 		};
 	};
@@ -246,28 +251,33 @@ _add = {
 	private ["_target","_item"];
 	_target = _this select 0;
 	_item = _this select 1;
-	if(typename _item=="ARRAY") then {
-		if(_loadMagsAmmo) then {
-			_target addMagazine _item;
-		} else {
-			_target addMagazine (_item select 0);
+	if(typename _item == "ARRAY") then {
+		if(_item select 0 != "") then {
+			if(_loadMagsAmmo) then {
+				_target addMagazine _item;
+			} else {
+				_target addMagazine (_item select 0);
+			};
 		};
 	} else {
 		if(isClass(configFile>>"CfgMagazines">>_item)) then {
 			_target addMagazine _item;
 		} else {
-			if(getNumber(configFile>>"CfgVehicles">>_item>>"isbackpack")==1) then {
-				unitBackpack _target addBackpackCargo [_item,1];  
-			} else {
-				if(isClass(configFile>>"CfgWeapons">>_item>>"WeaponSlotsInfo") && getNumber(configFile>>"CfgWeapons">>_item>>"showempty")==1) then {
-					unitBackpack _target addWeaponCargo [_item,1];  
+			if(_item != "") then {
+				if(getNumber(configFile>>"CfgVehicles">>_item>>"isbackpack")==1) then {
+					unitBackpack _target addBackpackCargo [_item,1];  
 				} else {
-					_target addItem _item;         
+					if(isClass(configFile>>"CfgWeapons">>_item>>"WeaponSlotsInfo") && getNumber(configFile>>"CfgWeapons">>_item>>"showempty")==1) then {
+						unitBackpack _target addWeaponCargo [_item,1];  
+					} else {
+						_target addItem _item;         
+					};
 				};
 			};
 		};
 	};
 };     
+
 
 // add backpack and add backpack items
 removeBackpack _target;
