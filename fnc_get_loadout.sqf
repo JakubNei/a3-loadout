@@ -2,15 +2,22 @@
 
 	AUTHOR: aeroson
 	NAME: fnc_get_loadout.sqf
-	VERSION: 2.7
+	VERSION: 2.8
 	
 	DOWNLOAD & PARTICIPATE:
 	https://github.com/aeroson/get-set-loadout
 	http://forums.bistudio.com/showthread.php?148577-GET-SET-Loadout-(saves-and-loads-pretty-much-everything)
 	
+	DESCRIPTION:
+	These scripts allows you set/get (load/save)all of the unit's gear, including:
+	uniform, vest, backpack, contents of it, all quiped items, all three weapons with their attachments, currently loaded magazines and number of ammo in magazines
+	Useful for saving/loading loadouts. 
+	Ideal for revive scripts where you have to set exactly the same loadout to newly created unit.
+	Uses workaround with placeholders to add vest/backpack items, so items stay where you put them.
+	
 	PARAMETER(S):
 	0 : target unit
-	1 : (optional, default []) options : ["ammo"]  will save ammo count of partially emptied magazines
+	1 : (optional) array of options, default [] : ["ammo"]  will save ammo count of partially emptied magazines
 	
 	RETURNS:
 	Array : array of strings/arrays containing target unit's loadout, to be used by fnc_set_loadout.sqf
@@ -20,20 +27,22 @@
 
 */
 
-private ["_target","_saveMagsAmmo","_onFoot","_currentWeapon","_currentMode","_isFlashlightOn","_isIRLaserOn","_loadedMagazines","_magazines","_weapon","_magazine","_asciToNum","_magazinesName","_magazinesAmmo","_getMagsAmmo","_data"];
+private ["_target","_options","_saveMagsAmmo","_onFoot","_currentWeapon","_currentMode","_isFlashlightOn","_isIRLaserOn","_loadedMagazines","_magazines","_weapon","_magazine","_asciToNum","_magazinesName","_magazinesAmmo","_getMagsAmmo","_data"];
 
-_saveMagsAmmo = false;
+_options = [];
 
 // addAction support
 if(count _this < 4) then {
-	_target = _this select 0;
-	if(count _this > 1) then {
-		_saveMagsAmmo = "ammo" in (_this select 1);
-	};  
+	private ["_PARAM_INDEX"]; _PARAM_INDEX=0;
+	#define PARAMREQ(A) if (count _this <= _PARAM_INDEX) exitWith { systemChat format["required param '%1' not supplied in file:'%2' at line:%3", #A ,__FILE__,__LINE__]; }; A = _this select _PARAM_INDEX; _PARAM_INDEX=_PARAM_INDEX+1;
+	#define PARAM(A,B) A = B; if (count _this > _PARAM_INDEX) then { A = _this select _PARAM_INDEX; }; _PARAM_INDEX=_PARAM_INDEX+1;
+	PARAMREQ(_target)
+	PARAM(_options,["ammo"])
 } else {
 	_target = player;
-};  
-
+};
+ 
+_saveMagsAmmo = "ammo" in _options;
 _onFoot = vehicle _target == _target;
          
 _currentWeapon = "";
@@ -132,18 +141,6 @@ _getMagsAmmo = {
 
 if(_saveMagsAmmo) then {
 	
-	// make integer from array of asci numberical characters
-	_asciToNum = {
-		private ["_asciNum","_out","_powers"];
-		_asciNum = _this select 0;
-		_out = 0;
-		_powers = [1,10,100,1000];
-		{
-			_out = _out + (_x-48) * (_powers select (count _asciNum - _forEachIndex - 1)); 	
-		} forEach _asciNum;	
-		_out;
-	};
-	
 	// fill following 2 arrays with ammo displayName and current ammo in it
 	_magazinesName = [];
 	_magazinesAmmo = [];
@@ -182,7 +179,7 @@ if(_saveMagsAmmo) then {
 		} forEach _x;
 		if !([_ammoCurrent,_ammoFull] call BIS_fnc_areEqual) then {
 			_magazinesName set [count _magazinesName, toString(_name)];
-			_magazinesAmmo set [count _magazinesAmmo, [_ammoCurrent] call _asciToNum];
+			_magazinesAmmo set [count _magazinesAmmo, parseNumber(toString(_ammoCurrent))]; 
 		};		
 	} forEach magazinesDetail player;
 	
