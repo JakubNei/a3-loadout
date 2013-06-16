@@ -43,14 +43,14 @@ if(count _this < 4) then {
 	//playSound3D ["A3\Sounds_F\sfx\ZoomIn.wav", _target]; 
 };
 
-_loadMagsAmmo = "ammo" in _options;
-
+if(isNil{_data}) exitWith {
+	systemChat "you are trying to set/load empty loadout";
+};
 if(count _data < 13) exitWith {
-	if(_target == player) exitWith {
-		systemChat "you were trying to set/load corrupted loadout";
-	};
+	systemChat "you are trying to set/load corrupted loadout";
 };
 
+_loadMagsAmmo = "ammo" in _options;
 _loadedMagazines = [];
 if(count _data > 13) then {
 	if(typeName(_data select 13)=="ARRAY") then {
