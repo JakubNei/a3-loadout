@@ -2,7 +2,7 @@
 
 	AUTHOR: aeroson
 	NAME: fnc_get_loadout.sqf
-	VERSION: 2.8
+	VERSION: 2.9
 	
 	DOWNLOAD & PARTICIPATE:
 	https://github.com/aeroson/get-set-loadout
@@ -37,7 +37,7 @@ if(count _this < 4) then {
 	#define PARAMREQ(A) if (count _this <= _PARAM_INDEX) exitWith { systemChat format["required param '%1' not supplied in file:'%2' at line:%3", #A ,__FILE__,__LINE__]; }; A = _this select _PARAM_INDEX; _PARAM_INDEX=_PARAM_INDEX+1;
 	#define PARAM(A,B) A = B; if (count _this > _PARAM_INDEX) then { A = _this select _PARAM_INDEX; }; _PARAM_INDEX=_PARAM_INDEX+1;
 	PARAMREQ(_target)
-	PARAM(_options,["ammo"])
+	PARAM(_options,[])
 } else {
 	_target = player;
 };
@@ -141,7 +141,7 @@ _getMagsAmmo = {
 
 if(_saveMagsAmmo) then {
 	
-	// fill following 2 arrays with ammo displayName and current ammo in it
+	// fill following 2 arrays with magazine name and current ammo in it
 	_magazinesName = [];
 	_magazinesAmmo = [];
 	{
@@ -205,6 +205,17 @@ if(_saveMagsAmmo) then {
 	
 };
 
+_backPackItems = {
+	private ["_cargo","_backpacks"];
+	_cargo = getbackpackcargo (unitbackpack _target);
+	_backpacks = [];
+	{
+		for "_i" from 1 to ((_cargo select 1) select _foreachindex) do {
+			_backpacks set [count _backpacks, _x];
+		};
+	} foreach (_cargo select 0);	
+	(backpackitems _target) + _backpacks;
+};
 
 
 _data=[
@@ -226,7 +237,7 @@ _data=[
 	[vestItems _target] call _getMagsAmmo, //10
 
 	backpack _target, //11 
-	[backpackItems _target] call _getMagsAmmo, //12
+	[[] call _backPackItems] call _getMagsAmmo, //12
 
 	_loadedMagazines, //13 (optional)
 	_currentWeapon, //14 (optional)
