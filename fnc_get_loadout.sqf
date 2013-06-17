@@ -27,7 +27,7 @@
 
 */
 
-private ["_target","_options","_saveMagsAmmo","_onFoot","_currentWeapon","_currentMode","_isFlashlightOn","_isIRLaserOn","_loadedMagazines","_magazines","_weapon","_magazine","_asciToNum","_magazinesName","_magazinesAmmo","_getMagsAmmo","_data"];
+private ["_target","_options","_saveMagsAmmo","_onFoot","_currentWeapon","_currentMode","_isFlashlightOn","_isIRLaserOn","_loadedMagazines","_magazines","_weapon","_magazine","_asciToNum","_magazinesName","_magazinesAmmo","_getMagsAmmo","_backPackItems","_data"];
 
 _options = [];
 
