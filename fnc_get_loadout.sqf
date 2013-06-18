@@ -2,7 +2,7 @@
 
 	AUTHOR: aeroson
 	NAME: fnc_get_loadout.sqf
-	VERSION: 2.9
+	VERSION: 3.0
 	
 	DOWNLOAD & PARTICIPATE:
 	https://github.com/aeroson/get-set-loadout
@@ -27,7 +27,7 @@
 
 */
 
-private ["_target","_options","_saveMagsAmmo","_onFoot","_currentWeapon","_currentMode","_isFlashlightOn","_isIRLaserOn","_loadedMagazines","_magazines","_weapon","_magazine","_asciToNum","_magazinesName","_magazinesAmmo","_getMagsAmmo","_backPackItems","_data"];
+private ["_target","_options","_saveMagsAmmo","_onFoot","_currentWeapon","_currentMode","_isFlashlightOn","_isIRLaserOn","_loadedMagazines","_magazines","_weapon","_magazine","_asciToNum","_magazinesName","_magazinesAmmo","_getMagsAmmo","_backPackItems","_assignedItems","_data"];
 
 _options = [];
 
@@ -217,9 +217,20 @@ _backPackItems = {
 	(backpackitems _target) + _backpacks;
 };
 
-
+_assignedItems = {
+	private ["_data"];
+	_data = assignedItems _target;
+	if(!((headgear _target) in _data)) then {
+		_data set [count _data, headgear _target];
+	};     
+	if(!((goggles _target) in _data)) then {
+		_data set [count _data, goggles _target];
+	};
+	_data;
+};
+      
 _data=[
-	assignedItems _target, //0
+	[] call _assignedItems, //0
 
 	primaryWeapon _target, //1
 	primaryWeaponItems _target, //2
