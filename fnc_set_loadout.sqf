@@ -2,7 +2,7 @@
 
 	AUTHOR: aeroson
 	NAME: fnc_set_loadout.sqf
-	VERSION: 3.8
+	VERSION: 3.9
 	
 	DOWNLOAD & PARTICIPATE:
 	https://github.com/aeroson/get-set-loadout
@@ -136,20 +136,18 @@ if(_weapon != "") then {
 		{
 			[_target, _x] call _add;
 		} forEach _magazines; // add magazine for each primary weapon muzzle							
-		_target addWeapon _weapon;                                                                                    
+		_target addWeapon _weapon;                                                                                                                
 		{ 
-			if(_x!="") then { 
-				_target removeItemFromPrimaryWeapon _x 
-			}; 
-		} forEach (primaryWeaponItems _target);                                 
-		{ 
-			if(_x!="") then { 
+			if(_x!="" && !(_x in (primaryWeaponItems _target))) then { 
 				_target addPrimaryWeaponItem _x; 
 			}; 
 		} foreach (_data select 2);
 	} else {
 		systemchat format["primary %1 doesn't exist",_weapon];
-		_currentWeapon = "";
+		if (_currentWeapon == _weapon) then {
+			_currentWeapon = "";
+			_currentMode = "";
+		};
 	};                             											                                                                                               
 };
 
@@ -169,13 +167,16 @@ if(_weapon != "") then {
 		[_target, _magazine] call _add;	
 		_target addWeapon _weapon;
 		{ 
-			if(_x!="") then {
+			if(_x!="" && !(_x in (handgunItems _target))) then {
 				_target addHandgunItem _x; 
 			}; 
 		} foreach (_data select 4);
 	} else {
 		systemchat format["handgun %1 doesn't exist",_weapon];
-		_currentWeapon = "";
+		if (_currentWeapon == _weapon) then {
+			_currentWeapon = "";
+			_currentMode = "";
+		};
 	};
 };
       
@@ -195,13 +196,16 @@ if(_weapon != "") then {
 		[_target, _magazine] call _add;	
 		_target addWeapon _weapon;
 		{ 
-			if(_x!="") then {
+			if(_x!="" && !(_x in (secondaryWeaponItems _target))) then {
 				_target addSecondaryWeaponItem _x;
 			}; 
 		} foreach (_data select 6);
 	} else {
 		systemchat format["secondary %1 doesn't exist",_weapon];
-		_currentWeapon = "";
+		if (_currentWeapon == _weapon) then {
+			_currentWeapon = "";
+			_currentMode = "";
+		};
 	};		
 };
 
