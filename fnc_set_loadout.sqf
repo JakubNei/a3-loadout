@@ -210,22 +210,20 @@ if(_weapon != "") then {
 };
 
 // select weapon and firing mode
-if ( vehicle _target == _target ) then {
-	if ( _currentWeapon != "" && _currentMode != "" ) then {
-		_muzzles = 0;                                                                                                           
-		while { (_currentWeapon != currentMuzzle _target || _currentMode != currentWeaponMode _target ) && _muzzles < 100 } do {
-			_target action ["SWITCHWEAPON", _target, _target, _muzzles];
-			_muzzles = _muzzles + 1;
-		};
-		if(_muzzles >= 100) then {
-			systemchat format["mode %1 for %2 doesn't exist", _currentMode, _currentWeapon];
-			_currentMode = "";		
-		};
+if ( vehicle _target == _target && _currentWeapon != "" && _currentMode != "" ) then {
+	_muzzles = 0;                                                                                                           
+	while { (_currentWeapon != currentMuzzle _target || _currentMode != currentWeaponMode _target ) && _muzzles < 100 } do {
+		_target action ["SWITCHWEAPON", _target, _target, _muzzles];
+		_muzzles = _muzzles + 1;
+	};
+	if(_muzzles >= 100) then {
+		systemchat format["mode %1 for %2 doesn't exist", _currentMode, _currentWeapon];
+		_currentMode = "";		
 	};
 } else {
 	_currentMode = "";
 };
-if (_currentMode == "") then {
+if (_currentMode == "" && _currentWeapon != "") then {
 	_target selectWeapon _currentWeapon;
 };
 
@@ -327,6 +325,6 @@ for "_i" from 1 to _placeholderCount do {
 };
 
 if ( vehicle _target == _target ) then {
-	_target switchMove "";
+	//_target switchMove "";
 	_target setPos (getPos _target);
 };
