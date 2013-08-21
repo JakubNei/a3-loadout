@@ -1,11 +1,11 @@
 /*
 
 	AUTHOR: aeroson
-	NAME: fnc_set_loadout.sqf
+	NAME: set_loadout.sqf
 	VERSION: 3.9
 	
 	DOWNLOAD & PARTICIPATE:
-	https://github.com/aeroson/get-set-loadout
+	https://github.com/aeroson/a3-loadout
 	http://forums.bistudio.com/showthread.php?148577-GET-SET-Loadout-(saves-and-loads-pretty-much-everything)
 	
 	DESCRIPTION:
@@ -31,11 +31,12 @@ _options = [];
 
 // addAction support
 if(count _this < 4) then {
-	private ["_PARAM_INDEX"]; _PARAM_INDEX=0;
-	#define PARAMREQ(A) if (count _this <= _PARAM_INDEX) exitWith { systemChat format["required param '%1' not supplied in file:'%2' at line:%3", #A ,__FILE__,__LINE__]; }; A = _this select _PARAM_INDEX; _PARAM_INDEX=_PARAM_INDEX+1;
+	#define PARAM_START private ["_PARAM_INDEX"]; _PARAM_INDEX=0;
+	#define PARAM_REQ(A) if (count _this <= _PARAM_INDEX) exitWith { systemChat format["required param '%1' not supplied in file:'%2' at line:%3", #A ,__FILE__,__LINE__]; }; A = _this select _PARAM_INDEX; _PARAM_INDEX=_PARAM_INDEX+1;
 	#define PARAM(A,B) A = B; if (count _this > _PARAM_INDEX) then { A = _this select _PARAM_INDEX; }; _PARAM_INDEX=_PARAM_INDEX+1;
-	PARAMREQ(_target)
-	PARAMREQ(_data)
+	PARAM_START
+	PARAM_REQ(_target)
+	PARAM_REQ(_data)
 	PARAM(_options,[])
 } else {
 	_target = player;
