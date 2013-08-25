@@ -7,7 +7,6 @@
 
 	DESCRIPTION:
 	takes over BTC revive gear/loadout set/get functions
-	now it saves/loads loadouts perfectly
 	http://forums.bistudio.com/showthread.php?148085-BTC-Revive 
 	
 	REQUIRES:
