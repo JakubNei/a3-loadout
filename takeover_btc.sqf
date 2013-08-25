@@ -1,6 +1,6 @@
 /*
 
-	AUTHOR: aeroson
+	AUTHOR: aeroson (github.com/aeroson/a3-loadout)
 	NAME: takeover_btc.sqf
 	
 	FOR BTC VERSION: 0.92
@@ -11,6 +11,7 @@
 	http://forums.bistudio.com/showthread.php?148085-BTC-Revive 
 	
 	REQUIRES:
+	in client's init:
 	getLoadout = compile preprocessFileLineNumbers 'get_loadout.sqf';
 	setLoadout = compile preprocessFileLineNumbers 'set_loadout.sqf';
 	
