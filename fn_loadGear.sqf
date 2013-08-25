@@ -36,22 +36,23 @@ if(isNil {_loadout}) exitWith {}; //Slot data doesn't exist
 
 VAS_loadout_ip = true;
 
-if(isNil{setLoadout}) then {
 	
-	_primary = _loadout select 1;
-	_launcher = _loadout select 2;
-	_handgun = _loadout select 3;
-	_magazines = _loadout select 4;
-	_uniform = _loadout select 5;
-	_vest = _loadout select 6;
-	_backpack = _loadout select 7;
-	_items = _loadout select 8;
-	_primitems = _loadout select 9;
-	_secitems = _loadout select 10;
-	_handgunitems = _loadout select 11;
-	_uitems = _loadout select 12;
-	_vitems = _loadout select 13;
-	_bitems = _loadout select 14;
+_primary = _loadout select 1;
+_launcher = _loadout select 2;
+_handgun = _loadout select 3;
+_magazines = _loadout select 4;
+_uniform = _loadout select 5;
+_vest = _loadout select 6;
+_backpack = _loadout select 7;
+_items = _loadout select 8;
+_primitems = _loadout select 9;
+_secitems = _loadout select 10;
+_handgunitems = _loadout select 11;
+_uitems = _loadout select 12;
+_vitems = _loadout select 13;
+_bitems = _loadout select 14;
+
+if(isNil{setLoadout}) then {
 	
 	//Strip the unit down
 	RemoveAllWeapons player;
@@ -96,27 +97,27 @@ if(isNil{setLoadout}) then {
 
 	[player,
 		[
-			_loadout select 8, // assigned items
+			_items, // assigned items
 			
-			_loadout select 1, // primary
-			_loadout select 9, // primary items
+			_primary, // primary
+			_primitems, // primary items
 			
-			_loadout select 3, // handgun
-			_loadout select 11, // handugn items 
+			_handgun, // handgun
+			_handgunitems, // handugn items 
 			
-			_loadout select 2, // secondary
-			_loadout select 10, // secondary items
+			_launcher, // secondary
+			_secitems, // secondary items
 			
-			_loadout select 5, // uniform
-			_loadout select 12, // uniform items
+			_uniform, // uniform
+			_uitems, // uniform items
 			
-			_loadout select 6, // vest
-			_loadout select 13, // vest items
+			_vest, // vest
+			_vitems, // vest items
 			
-			_loadout select 7, // backpack
-			_loadout select 14, // backpack items
+			_backpack, // backpack
+			_bitems, // backpack items
 			
-			[_loadout select 4,[],[]] // loaded magazines
+			[_magazines,[],[]] // loaded magazines
 		]
 	] call setLoadout;
 
