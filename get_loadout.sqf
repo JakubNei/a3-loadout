@@ -2,7 +2,7 @@
 
 	AUTHOR: aeroson
 	NAME: get_loadout.sqf
-	VERSION: 3.0
+	VERSION: 3.1
 	
 	DOWNLOAD & PARTICIPATE:
 	https://github.com/aeroson/a3-loadout
@@ -219,14 +219,16 @@ _backPackItems = {
 };
 
 _assignedItems = {
-	private ["_data"];
+	private ["_data", "_headgear", "_goggles"];
 	_data = assignedItems _target;
-	if(!((headgear _target) in _data)) then {
-		_data set [count _data, headgear _target];
-	};     
-	if(!((goggles _target) in _data)) then {
-		_data set [count _data, goggles _target];
-	};
+	_headgear = headgear _target;
+    _goggles = goggles _target;
+    if((_headgear != "") && !(_headgear in _data)) then {
+            _data set [count _data, _headgear];
+    };
+    if((_goggles != "") && !(_goggles in _data)) then {
+            _data set [count _data, _goggles];
+    };
 	_data;
 };
       
