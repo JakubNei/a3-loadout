@@ -29,12 +29,6 @@
 
 private ["_target","_options","_saveMagsAmmo","_onFoot","_currentWeapon","_currentMode","_isFlashlightOn","_isIRLaserOn","_loadedMagazines","_saveWeapon","_getMagsAmmo","_magazinesName","_magazinesAmmo","_backPackItems","_assignedItems","_data"];
 
-
-
-
-
-
-
 _options = [];
 
 // addAction support
@@ -66,11 +60,9 @@ if(_onFoot) then {
 } else {
 	_currentWeapon = currentWeapon _target;
 };
-
 	
 // save loaded magazines /+ loaded magazines ammo count	
 _loadedMagazines = [];
-
 
 // universal weapon saving
 _saveWeapon = {
@@ -101,18 +93,15 @@ _saveWeapon = {
 	_loadedMagazines set [count _loadedMagazines, _magazines];
 };
 
-
 [primaryWeapon _target] call _saveWeapon;
 [handgunWeapon _target] call _saveWeapon;
 [secondaryWeapon _target] call _saveWeapon;
-
 
 _getMagsAmmo = { // default function with _saveMagsAmmo == false
 	_this select 0;
 };
 
 if(_saveMagsAmmo) then {
-	
 	// fill following 2 arrays with magazine name and current ammo in it
 	_magazinesName = [];
 	_magazinesAmmo = [];
@@ -177,7 +166,6 @@ if(_saveMagsAmmo) then {
 	
 };
 
-
 // get backpack items
 _cargo = getbackpackcargo (unitbackpack _target);
 _backpacks = [];
@@ -187,7 +175,6 @@ _backpacks = [];
 	};
 } foreach (_cargo select 0);	
 _backPackItems = (backpackitems _target) + _backpacks;
-
 
 // get assigned items
 _assignedItems = assignedItems _target;
@@ -210,7 +197,6 @@ _magazines = [];
 	};
 } forEach _assignedItems;
 _loadedMagazines set [3, _magazines];
-
 
 // select back originaly selected weapon and mode
 if(vehicle _target == _target) then {
@@ -237,7 +223,6 @@ if(_currentMode == "") then {
 		_target selectWeapon _currentWeapon;
 	};
 };
-
    
 _data = [
 	_assignedItems, //0
