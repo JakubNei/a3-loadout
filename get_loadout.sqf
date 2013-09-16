@@ -2,7 +2,7 @@
 
 	AUTHOR: aeroson
 	NAME: get_loadout.sqf
-	VERSION: 3.1
+	VERSION: 3.2
 	
 	DOWNLOAD & PARTICIPATE:
 	https://github.com/aeroson/a3-loadout
@@ -27,7 +27,13 @@
 
 */
 
-private ["_target","_options","_saveMagsAmmo","_onFoot","_currentWeapon","_currentMode","_isFlashlightOn","_isIRLaserOn","_loadedMagazines","_magazines","_weapon","_magazine","_asciToNum","_magazinesName","_magazinesAmmo","_getMagsAmmo","_backPackItems","_assignedItems","_data"];
+private ["_target","_options","_saveMagsAmmo","_onFoot","_currentWeapon","_currentMode","_isFlashlightOn","_isIRLaserOn","_loadedMagazines","_saveWeapon","_getMagsAmmo","_magazinesName","_magazinesAmmo","_backPackItems","_assignedItems","_data"];
+
+
+
+
+
+
 
 _options = [];
 
@@ -52,7 +58,7 @@ _isFlashlightOn = false;
 _isIRLaserOn = false;
 
 // save weapon mode and muzzle
-if ( _onFoot ) then {
+if(_onFoot) then {
 	_currentWeapon = currentMuzzle _target;
 	_currentMode = currentWeaponMode _target;
 	_isFlashlightOn = _target isFlashlightOn _currentWeapon;
@@ -61,82 +67,47 @@ if ( _onFoot ) then {
 	_currentWeapon = currentWeapon _target;
 };
 
-
 	
-// save loaded magazines / loaded magazines ammo count	
+// save loaded magazines /+ loaded magazines ammo count	
 _loadedMagazines = [];
 
-_magazines = [];
-_weapon = primaryWeapon _target; 
-if(_weapon != "") then {
-	private ["_muzzles"];
-	_target selectWeapon _weapon;
-	_magazine = currentMagazine _target;
-	if(_saveMagsAmmo && _onFoot) then {
-		_magazine = [_magazine, _target ammo _weapon]; 
-	};
-	_magazines = [_magazine];
-	_muzzles = getArray(configFile>>"CfgWeapons">>_weapon>>"muzzles"); 	
-	{ // add one mag for each muzzle
-		if (_x != "this") then {
-			_target selectWeapon _x;
-			_magazine = currentMagazine _target; 
-			if(_saveMagsAmmo) then {
-				_magazine = [_magazine, _target ammo _x]; 
-			};			
-			_magazines set [count _magazines, _magazine];
+
+// universal weapon saving
+_saveWeapon = {
+	private ["_weapon","_magazines","_magazine","_muzzles"];
+	_weapon = _this select 0;
+	_magazines = []; 
+	if(_weapon != "") then {
+		_target selectWeapon _weapon;
+		_magazine = currentMagazine _target;
+		if(_saveMagsAmmo && _onFoot) then {
+			_magazine = [_magazine, _target ammo _weapon]; 
 		};
-	} forEach _muzzles;		
-};
-_loadedMagazines set [count _loadedMagazines, _magazines];
-
-_magazine = "";
-_weapon = handgunWeapon player;
-if(_weapon != "") then {
-	_target selectWeapon _weapon;
-	_magazine = currentMagazine _target;
-	if(_saveMagsAmmo && _onFoot) then {
-		_magazine = [_magazine, _target ammo _weapon]; 
-	};
-};
-_loadedMagazines set [count _loadedMagazines, _magazine];
-	
-_magazine = "";
-_weapon = secondaryWeapon _target;
-if(_weapon != "") then {
-	_target selectWeapon _weapon;
-	_magazine = currentMagazine _target;
-	if(_saveMagsAmmo && _onFoot) then {
-		_magazine = [_magazine, _target ammo _weapon]; 
-	};
-};
-_loadedMagazines set [count _loadedMagazines, _magazine];
-
-
-// select back originaly selected weapon and mode
-if ( vehicle _target == _target ) then {
-	if ( _currentWeapon != "" && _currentMode != "" ) then {
-		_muzzles = 0;
-		while { (_currentWeapon != currentMuzzle _target || _currentMode != currentWeaponMode _target ) && _muzzles < 200 } do {
-			_target action ["SWITCHWEAPON", _target, _target, _muzzles];
-			_muzzles = _muzzles + 1;
+		_magazines = [_magazine];
+		_muzzles = configFile>>"CfgWeapons">>_weapon>>"muzzles";
+		if(isArray(_muzzles)) then { 	
+			{ // add one mag for each muzzle
+				if (_x != "this") then {
+					_target selectWeapon _x;
+					_magazine = currentMagazine _target; 
+					if(_saveMagsAmmo) then {
+						_magazine = [_magazine, _target ammo _x]; 
+					};			
+					_magazines set [count _magazines, _magazine];
+				};
+			} forEach getArray(_muzzles);		
 		};
-		if ( _isFlashlightOn ) then {
-			_target action ["GunLightOn"];
-		};
-		if ( _isIRLaserOn ) then {
-			_target action ["IRLaserOn"];
-		};	
 	};
-} else {
-	_currentMode = "";
-};
-if (_currentMode == "") then {
-	_target selectWeapon _currentWeapon;
+	_loadedMagazines set [count _loadedMagazines, _magazines];
 };
 
 
-_getMagsAmmo = {
+[primaryWeapon _target] call _saveWeapon;
+[handgunWeapon _target] call _saveWeapon;
+[secondaryWeapon _target] call _saveWeapon;
+
+
+_getMagsAmmo = { // default function with _saveMagsAmmo == false
 	_this select 0;
 };
 
@@ -206,34 +177,70 @@ if(_saveMagsAmmo) then {
 	
 };
 
-_backPackItems = {
-	private ["_cargo","_backpacks"];
-	_cargo = getbackpackcargo (unitbackpack _target);
-	_backpacks = [];
-	{
-		for "_i" from 1 to ((_cargo select 1) select _foreachindex) do {
-			_backpacks set [count _backpacks, _x];
-		};
-	} foreach (_cargo select 0);	
-	(backpackitems _target) + _backpacks;
+
+// get backpack items
+_cargo = getbackpackcargo (unitbackpack _target);
+_backpacks = [];
+{
+	for "_i" from 1 to ((_cargo select 1) select _foreachindex) do {
+		_backpacks set [count _backpacks, _x];
+	};
+} foreach (_cargo select 0);	
+_backPackItems = (backpackitems _target) + _backpacks;
+
+
+// get assigned items
+_assignedItems = assignedItems _target;
+_headgear = headgear _target;
+_goggles = goggles _target;
+if((_headgear != "") && !(_headgear in _assignedItems)) then {
+	_assignedItems set [count _assignedItems, _headgear];
+};
+if((_goggles != "") && !(_goggles in _assignedItems)) then {
+	_assignedItems set [count _assignedItems, _goggles];
 };
 
-_assignedItems = {
-	private ["_data", "_headgear", "_goggles"];
-	_data = assignedItems _target;
-	_headgear = headgear _target;
-    _goggles = goggles _target;
-    if((_headgear != "") && !(_headgear in _data)) then {
-            _data set [count _data, _headgear];
-    };
-    if((_goggles != "") && !(_goggles in _data)) then {
-            _data set [count _data, _goggles];
-    };
-	_data;
+// get magazines of all assigned items
+_magazines = [];
+{
+	_target selectWeapon _x;
+	_magazine = currentMagazine _target;
+	if(_magazine != "") then {
+		_magazines set[count _magazines, _magazine];
+	};
+} forEach _assignedItems;
+_loadedMagazines set [3, _magazines];
+
+
+// select back originaly selected weapon and mode
+if(vehicle _target == _target) then {
+	if(_currentWeapon != "" && _currentMode != "") then {
+		_muzzles = 0;
+		while{ (_currentWeapon != currentMuzzle _target || _currentMode != currentWeaponMode _target ) && _muzzles < 200 } do {
+			_target action ["SWITCHWEAPON", _target, _target, _muzzles];
+			_muzzles = _muzzles + 1;
+		};
+		if(_isFlashlightOn) then {
+			_target action ["GunLightOn"];
+		};
+		if(_isIRLaserOn) then {
+			_target action ["IRLaserOn"];
+		};	
+	};
+} else {
+	_currentMode = "";
 };
-      
-_data=[
-	[] call _assignedItems, //0
+if(_currentMode == "") then {
+	if(_currentWeapon=="") then {
+		_target action ["SWITCHWEAPON", _target, _target, 0];			
+	} else {
+		_target selectWeapon _currentWeapon;
+	};
+};
+
+   
+_data = [
+	_assignedItems, //0
 
 	primaryWeapon _target, //1
 	primaryWeaponItems _target, //2
@@ -251,7 +258,7 @@ _data=[
 	[vestItems _target] call _getMagsAmmo, //10
 
 	backpack _target, //11 
-	[[] call _backPackItems] call _getMagsAmmo, //12
+	[_backPackItems] call _getMagsAmmo, //12
 
 	_loadedMagazines, //13 (optional)
 	_currentWeapon, //14 (optional)
