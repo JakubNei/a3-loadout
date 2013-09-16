@@ -55,11 +55,9 @@ if(count _data < 13) exitWith {
 #define EL(A,B) ((A) select (B))
 #define _THIS(A) EL(_this,A)
 
-
 // placeholders
 #define PLACEHOLDER_BACKPACK QUOTE(B_Kitbag_mcamo) // any backpack with capacity>0
 #define PLACEHOLDER_ITEM QUOTE(ItemWatch) // item placeholder should be smallest item possible
-
 
 _loadMagsAmmo = "ammo" in _options;
 _loadedMagazines = [];
@@ -251,7 +249,6 @@ if(_currentMode == "" && _currentWeapon != "") then {
 
 clearAllItemsFromBackpack _target;
 
-
 // add uniform, add uniform items and fill uniform with item placeholders
 _outfit = _data select 7;  
 if(_outfit != "") then {
@@ -326,7 +323,6 @@ _add = {
 	};       
 };     
 
-
 // add backpack and add backpack items
 removeBackpack _target;
 _outfit = _data select 11; 
@@ -341,7 +337,6 @@ if(_outfit != "") then {
 		systemchat format["backpack %1 doesn't exist",_outfit];
 	};
 };
-
 
 // remove item placeholders
 for "_i" from 1 to _placeholderCount do {
