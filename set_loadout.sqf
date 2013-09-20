@@ -2,7 +2,7 @@
 
 	AUTHOR: aeroson
 	NAME: set_loadout.sqf
-	VERSION: 4.0
+	VERSION: 4.1
 	
 	DOWNLOAD & PARTICIPATE:
 	https://github.com/aeroson/a3-loadout
@@ -252,18 +252,20 @@ clearAllItemsFromBackpack _target;
 // add uniform, add uniform items and fill uniform with item placeholders
 _outfit = _data select 7;  
 if(_outfit != "") then {
-	if(isClass(configFile>>"CfgWeapons">>_outfit)) then {
+	if(isClass(configFile>>"CfgWeapons">>_outfit)) then {			
 		_target addUniform _outfit;
 		_target addItem PLACEHOLDER_ITEM;
-		if( loadUniform _target > 0 ) then {
+		if(loadUniform _target > 0) then {
 			_target removeItem PLACEHOLDER_ITEM;
 			{ 
 				[_target,_x] call _add; 
-			} forEach (_data select 8);
-			while { loadUniform _target < 1 } do {
+			} forEach (_data select 8);			
+			while{true} do {
+				_loadBeforeAdd = loadUniform _target;
 				_target addItem PLACEHOLDER_ITEM;
+				if(loadUniform _target == _loadBeforeAdd) exitWith {};	
 				_placeholderCount = _placeholderCount + 1;
-			};	
+			};		
 		};
 	} else {
 		systemchat format["uniform %1 doesn't exist",_outfit];
@@ -276,15 +278,17 @@ if(_outfit != "") then {
 	if(isClass(configFile>>"CfgWeapons">>_outfit)) then {
 		_target addVest _outfit;
 		_target addItem PLACEHOLDER_ITEM;
-		if( loadVest _target > 0 ) then {
+		if(loadVest _target > 0) then {
 			_target removeItem PLACEHOLDER_ITEM;	
 			{ 
 				[_target,_x] call _add;
 			} forEach (_data select 10);
-			while { loadVest _target < 1 } do {
+			while{true} do {
+				_loadBeforeAdd = loadVest _target;
 				_target addItem PLACEHOLDER_ITEM;
+				if(loadVest _target == _loadBeforeAdd) exitWith {};	
 				_placeholderCount = _placeholderCount + 1;
-			};
+			};	
 		};
 	} else {
 		systemchat format["vest %1 doesn't exist",_outfit];
@@ -330,9 +334,13 @@ if(_outfit != "") then {
 	if(getNumber(configFile>>"CfgVehicles">>_outfit>>"isbackpack")==1) then {
 		_target addBackpack _outfit;                                                                    
 		clearAllItemsFromBackpack _target;
-		{
-			[_target, _x] call _add;
-		} forEach (_data select 12);
+		_target addItem PLACEHOLDER_ITEM;
+		if(loadBackpack _target > 0) then {
+			_target removeItem PLACEHOLDER_ITEM;			
+			{
+				[_target, _x] call _add;
+			} forEach (_data select 12);
+		};
 	} else {
 		systemchat format["backpack %1 doesn't exist",_outfit];
 	};
