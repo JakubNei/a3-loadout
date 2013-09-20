@@ -256,15 +256,15 @@ if(_outfit != "") then {
 		_target addUniform _outfit;
 		_target addItem PLACEHOLDER_ITEM;
 		if(loadUniform _target > 0) then {
-			_target removeItem PLACEHOLDER_ITEM;
+			_placeholderCount = _placeholderCount + 1;
 			{ 
 				[_target,_x] call _add; 
 			} forEach (_data select 8);			
 			while{true} do {
 				_loadBeforeAdd = loadUniform _target;
 				_target addItem PLACEHOLDER_ITEM;
-				if(loadUniform _target == _loadBeforeAdd) exitWith {};	
-				_placeholderCount = _placeholderCount + 1;
+				if(loadUniform _target == _loadBeforeAdd) exitWith {};
+				_placeholderCount = _placeholderCount + 1;					
 			};		
 		};
 	} else {
@@ -279,16 +279,16 @@ if(_outfit != "") then {
 		_target addVest _outfit;
 		_target addItem PLACEHOLDER_ITEM;
 		if(loadVest _target > 0) then {
-			_target removeItem PLACEHOLDER_ITEM;	
+			_placeholderCount = _placeholderCount + 1;	
 			{ 
 				[_target,_x] call _add;
 			} forEach (_data select 10);
 			while{true} do {
 				_loadBeforeAdd = loadVest _target;
 				_target addItem PLACEHOLDER_ITEM;
-				if(loadVest _target == _loadBeforeAdd) exitWith {};	
-				_placeholderCount = _placeholderCount + 1;
-			};	
+				if(loadVest _target == _loadBeforeAdd) exitWith {};
+				_placeholderCount = _placeholderCount + 1;	
+			};				
 		};
 	} else {
 		systemchat format["vest %1 doesn't exist",_outfit];
@@ -335,8 +335,8 @@ if(_outfit != "") then {
 		_target addBackpack _outfit;                                                                    
 		clearAllItemsFromBackpack _target;
 		_target addItem PLACEHOLDER_ITEM;
-		if(loadBackpack _target > 0) then {
-			_target removeItem PLACEHOLDER_ITEM;			
+		_placeholderCount = _placeholderCount + 1;
+		if(loadBackpack _target > 0) then {		
 			{
 				[_target, _x] call _add;
 			} forEach (_data select 12);
@@ -350,6 +350,7 @@ if(_outfit != "") then {
 for "_i" from 1 to _placeholderCount do {
 	_target removeItem PLACEHOLDER_ITEM; 
 };
+
 
 // make loadout visible fix?
 if(vehicle _target == _target) then {
