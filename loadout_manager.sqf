@@ -21,7 +21,7 @@
 // CONNECTORS:
 #define FUNC_getLoadout getLoadout
 #define FUNC_setLoadout setLoadout
-#define PATH_ME "client\loadout\loadout_manager.sqf"
+#define PATH_ME "loadout_manager.sqf"
 	
 
 if (isDedicated) exitWith {};
