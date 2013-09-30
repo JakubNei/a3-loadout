@@ -2,7 +2,7 @@
 
 	AUTHOR: aeroson
 	NAME: get_loadout.sqf
-	VERSION: 3.2
+	VERSION: 3.3
 	
 	DOWNLOAD & PARTICIPATE:
 	https://github.com/aeroson/a3-loadout
@@ -191,9 +191,11 @@ if((_goggles != "") && !(_goggles in _assignedItems)) then {
 _magazines = [];
 {
 	_target selectWeapon _x;
-	_magazine = currentMagazine _target;
-	if(_magazine != "") then {
-		_magazines set[count _magazines, _magazine];
+	if(currentWeapon _target==_x) then {
+		_magazine = currentMagazine _target;
+		if(_magazine != "") then {
+			_magazines set[count _magazines, _magazine];
+		};	
 	};
 } forEach _assignedItems;
 _loadedMagazines set [3, _magazines];
@@ -208,9 +210,13 @@ if(vehicle _target == _target) then {
 		};
 		if(_isFlashlightOn) then {
 			_target action ["GunLightOn"];
+		} else {
+			_target action ["GunLightOff"];
 		};
 		if(_isIRLaserOn) then {
 			_target action ["IRLaserOn"];
+		} else {
+			_target action ["IRLaserOff"];
 		};	
 	};
 } else {
