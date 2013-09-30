@@ -32,8 +32,8 @@
 #define FUNC_getLoadout getLoadout
 #define FUNC_setLoadout setLoadout
 
-#define PATH_ME QUOTE(aero\client\loadout\loadout_manager.sqf)
-//#define PATH_ME QUOTE(loadout_manager.sqf)
+//#define PATH_ME QUOTE(aero\client\loadout\loadout_manager.sqf)
+#define PATH_ME QUOTE(loadout_manager.sqf)
 
 
 
