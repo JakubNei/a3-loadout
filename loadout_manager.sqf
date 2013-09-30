@@ -44,9 +44,6 @@ if (isDedicated) exitWith {};
 private["_obj","_vasAdd","_actions","_args","_removeActions","_mainMenu","_loadout","_arg1","_version"];
 
 _obj = _this select 0;
-aaa=_obj;
-
-
 
 // remove all actions added by this script
 _removeActions = {
