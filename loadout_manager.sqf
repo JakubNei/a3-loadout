@@ -2,9 +2,9 @@
 
 	AUTHOR: aeroson
 	NAPATH_ME: loadout_manager.sqf
-	VERSION: 1.1
+	VERSION: 1.3
 	
-	DOWNLOAD, DOCUPATH_MENTATION & PARTICIPATE:
+	DOWNLOAD, DOCUMENTATION & PARTICIPATE:
 	https://github.com/aeroson/get-set-loadout
 	http://forums.bistudio.com/showthread.php?148577-GET-SET-Loadout-(saves-and-loads-pretty-much-everything)
 	
@@ -18,17 +18,34 @@
 	0 = [this] execVM 'loadout_manager.sqf';
 	
 */	
+//OPTIONS:
+#define SHOW_MENU_FOR [#save,#load,#remove,#vas]
+#define PROFILE_VAR_NAME aero_loadout 
+
+
+
+
+
 // CONNECTORS:
+#define QUOTE(A) #A
+
 #define FUNC_getLoadout getLoadout
 #define FUNC_setLoadout setLoadout
-#define PATH_ME "loadout_manager.sqf"
-	
+
+#define PATH_ME QUOTE(aero\client\loadout\loadout_manager.sqf)
+//#define PATH_ME QUOTE(loadout_manager.sqf)
+
+
+
 
 if (isDedicated) exitWith {};
+
 
 private["_obj","_vasAdd","_actions","_args","_removeActions","_mainMenu","_loadout","_arg1","_version"];
 
 _obj = _this select 0;
+aaa=_obj;
+
 
 
 // remove all actions added by this script
@@ -42,38 +59,47 @@ _removeActions = {
 
 // show main menu
 _mainMenu = {
-	private ["_loadout","_any","_l"];
+	private ["_loadout","_any","_l","_show"];
 	call _removeActions;
-	_loadout = profileNamespace getVariable "aero_loadout";
-	if !isNil("_loadout") then {
+
+	_loadout = profileNamespace getVariable QUOTE(PROFILE_VAR_NAME);
+	if !isNil("_loadout") then {  			
 		_any = false;
 		for "_i" from 0 to count(_loadout) do {
 			_l = _loadout select _i;
-			if !isNil("_l") then {
-				_any = true;		
-				_actions = _actions + [_obj addAction [format["<t color='#00cc00'>Load </t><t color='#ffffff' size='1.5'>%1</t>",_l select 0], PATH_ME, ["load",_i], 3000-_i]];
+			if (!isNil("_l")) then {
+				_any = true;	
+				if("load" in SHOW_MENU_FOR) then {	
+					_actions = _actions + [_obj addAction [format["<t color='#00cc00'>Load </t><t color='#ffffff' size='1.5'>%1</t>",_l select 0], PATH_ME, ["load",_i], 3000-_i]];
+				};
 			};
 		};
-		if _any then {
+		if ((_any)&&("remove" in SHOW_MENU_FOR)) then {
 			_actions = _actions + [ _obj addAction ["<t color='#ff1111'>Remove loadout ...</t>", PATH_ME, ["remove_menu"], 2004] ];
 		};
 	};
-	_actions = _actions + [ _obj addAction ["<t color='#ff8822'>Save loadout ...</t>", PATH_ME, ["save_menu"], 2008] ];
-	_actions = _actions + [ _obj addAction ["<t color='#0099ee'>Offer loadout ...</t>", PATH_ME, ["offer_menu"], 2002] ];
-	
-	_any = false;
-	for "_i" from 0 to 9 do {
-		if(!isnil {profileNameSpace getVariable format["vas_gear_new_%1",_i]}) then {
-			_any = true;
-		};
-	};      	
-	for "_i" from 0 to 9 do {
-		if(!isnil {profileNameSpace getVariable format["vas_gear_%1",_i]}) then {
-			_any = true;
-		};
+	if("save" in SHOW_MENU_FOR) then {
+		_actions = _actions + [ _obj addAction ["<t color='#ff8822'>Save loadout ...</t>", PATH_ME, ["save_menu"], 2008] ];
 	};
-	if(_any) then {	
-		_actions = _actions + [ _obj addAction ["<t color='#0099ee'>Load VAS loadout ...</t>", PATH_ME, ["vas_menu"], 2000] ];
+	/*if("offer" in SHOW_MENU_FOR) then {
+		_actions = _actions + [ _obj addAction ["<t color='#0099ee'>Offer loadout ...</t>", PATH_ME, ["offer_menu"], 2002] ];
+	};*/
+	
+	if ("vas" in SHOW_MENU_FOR) then {
+		_any = false;
+		for "_i" from 0 to 9 do {
+			if(!isnil {profileNameSpace getVariable format["vas_gear_new_%1",_i]}) then {
+				_any = true;
+			};
+		};      	
+		for "_i" from 0 to 9 do {
+			if(!isnil {profileNameSpace getVariable format["vas_gear_%1",_i]}) then {
+				_any = true;
+			};
+		};
+		if(_any) then {	
+			_actions = _actions + [ _obj addAction ["<t color='#0099ee'>Load VAS loadout ...</t>", PATH_ME, ["vas_menu"], 2000] ];
+		};
 	};
 };
  
@@ -110,18 +136,18 @@ if isNil("_actions") then {
 };
 
 _arg1 = _args select 1;
-_loadout = profileNamespace getVariable "aero_loadout";
+_loadout = profileNamespace getVariable QUOTE(PROFILE_VAR_NAME);
 
 if isNil("_loadout") then 
 {
-	profileNamespace setVariable ["aero_loadout",[]];
+	profileNamespace setVariable [QUOTE(PROFILE_VAR_NAME),[]];
 };
 
 
 switch (_args select 0) do {
  
 	case "back": {
-	
+
 		call _mainMenu;
 
 	};
@@ -164,7 +190,7 @@ switch (_args select 0) do {
 		_loadoutName = (_loadout select _arg1) select 0;
 		hint parseText format["<t size='1' color='#ff1111'>Removed loadot</t>"];
 		_loadout set[_arg1, nil];
-		profileNamespace setVariable ["aero_loadout",_loadout];
+		profileNamespace setVariable [QUOTE(PROFILE_VAR_NAME),_loadout];
 		
 		call _mainMenu;	 
 		
@@ -206,7 +232,7 @@ switch (_args select 0) do {
 			]
 		]; 
 			
-		profileNamespace setVariable ["aero_loadout",_loadout];
+		profileNamespace setVariable [QUOTE(PROFILE_VAR_NAME),_loadout];
 		saveProfileNamespace;
 		hint parseText format["<t size='1' color='#ff8822'>Saved loadout</t>"];
 		call _mainMenu;	
