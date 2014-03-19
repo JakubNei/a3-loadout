@@ -2,22 +2,26 @@
 
 	AUTHOR: aeroson
 	NAME: get_loadout.sqf
-	VERSION: 3.3
+	VERSION: 3.4
 	
 	DOWNLOAD & PARTICIPATE:
 	https://github.com/aeroson/a3-loadout
 	http://forums.bistudio.com/showthread.php?148577-GET-SET-Loadout-(saves-and-loads-pretty-much-everything)
 	
 	DESCRIPTION:
+	I guarantee backwards compatibility.
 	These scripts allows you set/get (load/save)all of the unit's gear, including:
-	uniform, vest, backpack, contents of it, all quiped items, all three weapons with their attachments, currently loaded magazines and number of ammo in magazines
+	uniform, vest, backpack, contents of it, all quiped items, all three weapons with their attachments, currently loaded magazines and number of ammo in magazines.
+	All this while preserving order of items.
 	Useful for saving/loading loadouts. 
 	Ideal for revive scripts where you have to set exactly the same loadout to newly created unit.
 	Uses workaround with placeholders to add vest/backpack items, so items stay where you put them.
 	
 	PARAMETER(S):
 	0 : target unit
-	1 : (optional) array of options, default [] : ["ammo"]  will save ammo count of partially emptied magazines
+	1 : (optional) array of options, default [] : 
+		"ammo" will save ammo count of partially emptied magazines
+		"repetitive" intended for repetitive use, will not use selectWeapon, means no visible effect on solder, but will not save magazines of assigned items such as laser designator batteries
 	
 	RETURNS:
 	Array : array of strings/arrays containing target unit's loadout, to be used by fnc_set_loadout.sqf
@@ -27,7 +31,7 @@
 
 */
 
-private ["_target","_options","_saveMagsAmmo","_onFoot","_currentWeapon","_currentMode","_isFlashlightOn","_isIRLaserOn","_loadedMagazines","_saveWeapon","_getMagsAmmo","_magazinesName","_magazinesAmmo","_backPackItems","_assignedItems","_data"];
+private ["_target","_options","_saveMagsAmmo","_isRepetitive","_isOnFoot","_currentWeapon","_currentMode","_isFlashlightOn","_isIRLaserOn","_magazinesAmmo","_loadedMagazines","_saveWeaponMagazines","_getMagsAmmo","_backPackItems","_assignedItems","_data"];
 
 _options = [];
 
@@ -44,122 +48,96 @@ if(count _this < 4) then {
 };
  
 _saveMagsAmmo = "ammo" in _options;
-_onFoot = vehicle _target == _target;
+_isRepetitive = "repetitive" in _options;
+_isOnFoot = vehicle _target == _target;
          
 _currentWeapon = "";
 _currentMode = "";
 _isFlashlightOn = false;
 _isIRLaserOn = false;
 
+_magazinesAmmo = magazinesAmmoFull _target;
+
 // save weapon mode and muzzle
-if(_onFoot) then {
+if(_isOnFoot) then {
 	_currentWeapon = currentMuzzle _target;
 	_currentMode = currentWeaponMode _target;
 	_isFlashlightOn = _target isFlashlightOn _currentWeapon;
-	_isIRLaserOn = _target isIRLaserOn _currentWeapon;  
+	_isIRLaserOn = _target isIRLaserOn _currentWeapon;
 } else {
 	_currentWeapon = currentWeapon _target;
 };
 	
-// save loaded magazines /+ loaded magazines ammo count	
-_loadedMagazines = [];
+
+_loadedMagazines=[];
 
 // universal weapon saving
-_saveWeapon = {
-	private ["_weapon","_magazines","_magazine","_muzzles"];
+_saveWeaponMagazines = {
+	private ["_weapon","_magazines","_muzzles","_saveMagazine"];
 	_weapon = _this select 0;
-	_magazines = []; 
-	if(_weapon != "") then {
-		_target selectWeapon _weapon;
-		_magazine = currentMagazine _target;
-		if(_saveMagsAmmo && _onFoot) then {
-			_magazine = [_magazine, _target ammo _weapon]; 
+	_magazines = []; 	
+
+	_saveMagazine = { // find, save and eat mag for _weapon		
+		private ["_weapon","_magazine","_ammo"];
+		_weapon = _this select 0;
+		_magazine = "";
+		_ammo = 0;
+		{ 			
+			if((_x select 4)==_weapon) then {
+				_magazine = _x select 0;				
+				_ammo = _x select 1;
+				_x = -1;
+			};
+		} forEach _magazinesAmmo;
+		_magazinesAmmo = _magazinesAmmo - [-1];	
+		if(_magazine!="") then {
+			if(_saveMagsAmmo) then {
+				_magazines set [count _magazines, [_magazine, _ammo]];
+			} else {
+				_magazines set [count _magazines, _magazine];
+			};
 		};
-		_magazines = [_magazine];
+	};	
+
+	if(_weapon != "") then {
+		[_weapon] call _saveMagazine;
 		_muzzles = configFile>>"CfgWeapons">>_weapon>>"muzzles";
 		if(isArray(_muzzles)) then { 	
 			{ // add one mag for each muzzle
-				if (_x != "this") then {
-					_target selectWeapon _x;
-					_magazine = currentMagazine _target; 
-					if(_saveMagsAmmo) then {
-						_magazine = [_magazine, _target ammo _x]; 
-					};			
-					_magazines set [count _magazines, _magazine];
+				if (_x != "this") then {					
+					[_x] call _saveMagazine;			
 				};
 			} forEach getArray(_muzzles);		
 		};
 	};
+
 	_loadedMagazines set [count _loadedMagazines, _magazines];
 };
 
-[primaryWeapon _target] call _saveWeapon;
-[handgunWeapon _target] call _saveWeapon;
-[secondaryWeapon _target] call _saveWeapon;
+// save loaded mags for each weapon separetely, since some weapons can use same magazines
+[primaryWeapon _target] call _saveWeaponMagazines;
+[handgunWeapon _target] call _saveWeaponMagazines;
+[secondaryWeapon _target] call _saveWeaponMagazines;
 
 _getMagsAmmo = { // default function with _saveMagsAmmo == false
 	_this select 0;
 };
-
 if(_saveMagsAmmo) then {
-	// fill following 2 arrays with magazine name and current ammo in it
-	_magazinesName = [];
-	_magazinesAmmo = [];
-	{
-		private ["_name","_ammo","_ammoCountIndex","_ammoCurrent","_ammoFull","_readingAmmoFull"];
-		scopeName "a";	
-		_name = [];
-		_ammoCurrent = [];
-		_ammoFull = [];
-		_readingAmmoFull = false;
-		_x = toArray _x;	
-		_ammoCountIndex = count _x - 1;
-		while { _ammoCountIndex>0 && (_x select _ammoCountIndex)!=40 } do {
-			_ammoCountIndex = _ammoCountIndex - 1;
-		};	
-		{
-			if(_forEachIndex != _ammoCountIndex) then {	
-				if(_forEachIndex < _ammoCountIndex) then {
-					_name set [count _name, _x];
-				} else {					
-					if(_x==47) then {
-						_readingAmmoFull = true;
-					} else {
-						if(!_readingAmmoFull) then {
-							_ammoCurrent set [count _ammoCurrent, _x];
-						} else {
-							if(_x==41) then {
-								breakTo "a";
-							} else {	
-								_ammoFull set [count _ammoFull, _x];
-							};
-						};
-					};
-				};
-			};	
-		} forEach _x;
-		if !([_ammoCurrent,_ammoFull] call BIS_fnc_areEqual) then {
-			_magazinesName set [count _magazinesName, toString(_name)];
-			_magazinesAmmo set [count _magazinesAmmo, parseNumber(toString(_ammoCurrent))]; 
-		};		
-	} forEach magazinesDetail player;
-	
-	// check if input array contains magazine, if it does, find it in magazinesDetail and change _x to [_x, ammo count]
+	// check if input array contains magazine, if it does, find it add ammo count
 	_getMagsAmmo = {
-		private ["_items","_index"];
-		_items = _this select 0;
+		private ["_items","_location","_item","_itemIndex"];
+		_items = _this select 0;		
+		_location = _this select 1;
 		{
-			_name = getText(configFile >> "cfgMagazines" >> _x >> "displayName");
-			if(_name!="") then {
-				_index = _magazinesName find _name;
-				if(_index != -1) then {		
-					_items set [_forEachIndex, [_x, _magazinesAmmo select _index]];
-					_magazinesName set [_index, -1];
-					_magazinesAmmo set [_index, -1];
-					_magazinesName = _magazinesName - [-1];
-					_magazinesAmmo = _magazinesAmmo - [-1];
-				};		
-			}
+			_item = _x;
+			_itemIndex = _forEachIndex;
+			{
+				if(_x select 4==_location && _x select 0==_item) then {
+					_items set[_itemIndex, [_item, _x select 1]];
+					_item = -1;					
+				}
+			} forEach _magazinesAmmo;
+			_magazinesAmmo = _magazinesAmmo - [-1];	
 		} forEach _items;
 		_items;
 	};
@@ -176,7 +154,7 @@ _backpacks = [];
 } foreach (_cargo select 0);	
 _backPackItems = (backpackitems _target) + _backpacks;
 
-// get assigned items
+// get assigned items, headgear and goggles is not part of assignedItems
 _assignedItems = assignedItems _target;
 _headgear = headgear _target;
 _goggles = goggles _target;
@@ -187,73 +165,110 @@ if((_goggles != "") && !(_goggles in _assignedItems)) then {
 	_assignedItems set [count _assignedItems, _goggles];
 };
 
-// get magazines of all assigned items
-_magazines = [];
-{
-	_target selectWeapon _x;
-	if(currentWeapon _target==_x) then {
-		_magazine = currentMagazine _target;
-		if(_magazine != "") then {
-			_magazines set[count _magazines, _magazine];
-		};	
-	};
-} forEach _assignedItems;
-_loadedMagazines set [3, _magazines];
 
-// select back originaly selected weapon and mode
-if(vehicle _target == _target) then {
-	if(_currentWeapon != "" && _currentMode != "") then {
-		_muzzles = 0;
-		while{ (_currentWeapon != currentMuzzle _target || _currentMode != currentWeaponMode _target ) && _muzzles < 200 } do {
-			_target action ["SWITCHWEAPON", _target, _target, _muzzles];
-			_muzzles = _muzzles + 1;
-		};
-		if(_isFlashlightOn) then {
-			_target action ["GunLightOn"];
+
+/*
+// use this once magazinesAmmoFull is fixed and shows magazines of assignedItems
+
+// get magazines of everything else except weapons, most likely assigned items
+// only ["Uniform","Vest","Backpack"] locations remain, weapon locations have already been eaten
+_magazines = [];
+{	
+	if(_x select 2) then {
+		if(_saveMagsAmmo) then {
+			_magazines set[count _magazines, [_x select 0, _x select 1]];
 		} else {
-			_target action ["GunLightOff"];
+			_magazines set[count _magazines, _x select 0];
 		};
-		if(_isIRLaserOn) then {
-			_target action ["IRLaserOn"];
+		_x = -1;
+	};
+} forEach _magazinesAmmo;
+_magazinesAmmo = _magazinesAmmo - [-1];	
+_loadedMagazines set [3, _magazines];
+*/
+
+
+// old method using selectWeapon, cycles and tries to selectWeapon all assigned items
+if(!_isRepetitive) then {
+	private ["_weaponHasChanged"];
+	_weaponHasChanged = false;
+
+	// get magazines of all assigned items
+	_magazines = [];
+	{
+		_target selectWeapon _x;
+		if(currentWeapon _target==_x) then {
+			_weaponHasChanged = true;
+			_magazine = currentMagazine _target;
+			if(_magazine != "") then {
+				if(_saveMagsAmmo) then {
+					_magazines set[count _magazines, [_magazine, _target ammo _x]];
+				} else {
+					_magazines set[count _magazines, _magazine];
+				};
+			};	
+		};
+	} forEach _assignedItems;
+	_loadedMagazines set [3, _magazines];
+
+	// select back originaly selected weapon and mode, only if weapon has changed
+	if(_weaponHasChanged) then {
+		if(_isOnFoot) then {
+			if(_currentWeapon != "" && _currentMode != "") then {
+				_muzzles = 0;
+				while{ (_currentWeapon != currentMuzzle _target || _currentMode != currentWeaponMode _target ) && _muzzles < 200 } do {
+					_target action ["SWITCHWEAPON", _target, _target, _muzzles];
+					_muzzles = _muzzles + 1;
+				};
+				if(_isFlashlightOn) then {
+					_target action ["GunLightOn"];
+				} else {
+					_target action ["GunLightOff"];
+				};
+				if(_isIRLaserOn) then {
+					_target action ["IRLaserOn"];
+				} else {
+					_target action ["IRLaserOff"];
+				};	
+			};
 		} else {
-			_target action ["IRLaserOff"];
-		};	
-	};
-} else {
-	_currentMode = "";
-};
-if(_currentMode == "") then {
-	if(_currentWeapon=="") then {
-		_target action ["SWITCHWEAPON", _target, _target, 0];			
-	} else {
-		_target selectWeapon _currentWeapon;
+			_currentMode = "";
+		};
+		if(_currentMode == "") then {
+			if(_currentWeapon=="") then {
+				_target action ["SWITCHWEAPON", _target, _target, 0];			
+			} else {
+				_target selectWeapon _currentWeapon;
+			};
+		};
 	};
 };
+
    
 _data = [
-	_assignedItems, //0
+	_assignedItems, //0 []
 
-	primaryWeapon _target, //1
-	primaryWeaponItems _target, //2
+	primaryWeapon _target, //1 ""
+	primaryWeaponItems _target, //2 []
 
-	handgunWeapon _target, //3
-	handgunItems _target, //4
+	handgunWeapon _target, //3 ""
+	handgunItems _target, //4 []
 
-	secondaryWeapon _target, //5
-	secondaryWeaponItems _target, //6 
+	secondaryWeapon _target, //5 ""
+	secondaryWeaponItems _target, //6 []
 
-	uniform _target, //7
-	[uniformItems _target] call _getMagsAmmo, //8
+	uniform _target, //7 ""
+	[uniformItems _target, "Uniform"] call _getMagsAmmo, //8 ["magazine without ammo count",["magazine with ammo count",30], ....]
 
-	vest _target, //9
-	[vestItems _target] call _getMagsAmmo, //10
+	vest _target, //9 ""
+	[vestItems _target, "Vest"] call _getMagsAmmo, //10
 
-	backpack _target, //11 
-	[_backPackItems] call _getMagsAmmo, //12
+	backpack _target, //11  ""
+	[_backPackItems, "Backpack"] call _getMagsAmmo, //12
 
-	_loadedMagazines, //13 (optional)
-	_currentWeapon, //14 (optional)
-	_currentMode //15 (optional)
+	_loadedMagazines, //13 (optional) [[primary mags],[handgun mags],[secondary mags],[other mags]]
+	_currentWeapon, //14 (optional) ""
+	_currentMode //15 (optional) ""
 ];
 
 // addAction support
