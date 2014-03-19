@@ -132,10 +132,10 @@ if(_saveMagsAmmo) then {
 			_item = _x;
 			_itemIndex = _forEachIndex;
 			{
-				if(_x select 4==_location && _x select 0==_item) then {
+				if((_x select 4)==_location && (_x select 0)==_item) then {
 					_items set[_itemIndex, [_item, _x select 1]];
-					_item = -1;					
-				}
+					_x = -1;					
+				};
 			} forEach _magazinesAmmo;
 			_magazinesAmmo = _magazinesAmmo - [-1];	
 		} forEach _items;
