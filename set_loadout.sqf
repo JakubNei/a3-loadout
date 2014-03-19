@@ -2,22 +2,24 @@
 
 	AUTHOR: aeroson
 	NAME: set_loadout.sqf
-	VERSION: 4.1
+	VERSION: 4.2
 	
 	DOWNLOAD & PARTICIPATE:
 	https://github.com/aeroson/a3-loadout
 	http://forums.bistudio.com/showthread.php?148577-GET-SET-Loadout-(saves-and-loads-pretty-much-everything)
 	
 	DESCRIPTION:
+	I guarantee backwards compatibility.
 	These scripts allows you set/get (load/save)all of the unit's gear, including:
-	uniform, vest, backpack, contents of it, all quiped items, all three weapons with their attachments, currently loaded magazines and number of ammo in magazines
+	uniform, vest, backpack, contents of it, all quiped items, all three weapons with their attachments, currently loaded magazines and number of ammo in magazines.
+	All this while preserving order of items.
 	Useful for saving/loading loadouts. 
 	Ideal for revive scripts where you have to set exactly the same loadout to newly created unit.
 	Uses workaround with placeholders to add vest/backpack items, so items stay where you put them.
 	
 	PARAMETER(S):
 	0 : target unit
-	1 : array of strings/arrays containing desired target unit's loadout, obtained from fnc_get_loadout.sqf
+	1 : array of strings/arrays containing desired target unit's loadout, obtained from get_loadout.sqf
 	2 : (optional) array of options, default [] : ["ammo"]  will allow loading of partially emptied magazines, otherwise magazines will be full 	 	
 	
 	addAction support:
@@ -25,7 +27,7 @@
   
 */
 
-private ["_target","_options","_loadMagsAmmo","_data","_loadedMagazines","_placeholderCount","_add","_outfit","_addWeapon","_addPrimary","_addHandgun","_addSecondary","_addOrder","_currentWeapon","_currentMode"];
+private ["_target","_options","_loadMagsAmmo","_data","_loadedMagazines","_placeholderCount","_loadBeforeAdd","_add","_outfit","_addWeapon","_addPrimary","_addHandgun","_addSecondary","_addOrder","_currentWeapon","_currentMode"];
 
 _options = [];
 
@@ -57,7 +59,7 @@ if(count _data < 13) exitWith {
 
 // placeholders
 #define PLACEHOLDER_BACKPACK QUOTE(B_Kitbag_mcamo) // any backpack with capacity>0
-#define PLACEHOLDER_ITEM QUOTE(ItemWatch) // item placeholder should be smallest item possible
+#define PLACEHOLDER_ITEM QUOTE(ItemWatch) // addItem placeholder should be smallest item possible
 
 _loadMagsAmmo = "ammo" in _options;
 _loadedMagazines = [];
@@ -111,10 +113,13 @@ removeUniform _target;
 removeVest _target;
 removeBackpack _target;
 
+
 _outfit = PLACEHOLDER_BACKPACK; // we need to add items somewhere before we can assign them
 _target addBackpack _outfit;
 clearAllItemsFromBackpack _target;
 removeAllAssignedItems _target;
+removeHeadgear _target;
+removeGoggles _target;
 
 // add loaded magazines of assigned items
 if(count _loadedMagazines>=3) then {
@@ -216,7 +221,7 @@ _addSecondary = {
 };
 
 
-// first added weapon is selected, order add functions to firstly add currently selected weapon
+// first added weapon is selected weapon, order add functions to firstly add currently selected weapon
 _addOrder=[_addPrimary,_addHandgun,_addSecondary];
 if(_currentWeapon!="") then {
 	_addOrder = switch _currentWeapon do { 
