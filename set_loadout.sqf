@@ -2,7 +2,7 @@
 
 	AUTHOR: aeroson
 	NAME: set_loadout.sqf
-	VERSION: 4.2
+	VERSION: 4.3
 	
 	DOWNLOAD & PARTICIPATE:
 	https://github.com/aeroson/a3-loadout
@@ -82,28 +82,21 @@ _placeholderCount = 0;
 
 // basic add function intended for use with uniform and vest
 _add = {
-	private ["_target","_item"];
+	private ["_target","_item","_callback"];	
 	_target = _this select 0;
 	_item = _this select 1;
+	_callback = _this select 2;
 	if(typename _item == "ARRAY") then {
 		if(_item select 0 != "") then {
 			if(_loadMagsAmmo) then {
 				_target addMagazine _item;
 			} else {
-				_target addMagazine (_item select 0);
+				(_item select 0) call _callback;
 			};
 		};
 	} else {
 		if(_item != "") then {
-			if(isClass(configFile>>"CfgMagazines">>_item)) then {
-				_target addMagazine _item;
-			} else {
-				if(isClass(configFile>>"CfgWeapons">>_item>>"WeaponSlotsInfo") && getNumber(configFile>>"CfgWeapons">>_item>>"showempty")==1) then {
-					_target addWeapon _item;  
-				} else {
-					_target addItem _item;        
-				};
-			};
+			_item call _callback;
 		};
 	};
 };
@@ -124,15 +117,38 @@ removeGoggles _target;
 // add loaded magazines of assigned items
 if(count _loadedMagazines>=3) then {
 	{ 
-		[_target,_x] call _add;
+		[_target, _x, { _target addItemToBackpack _x }] call _add;
 	} forEach (_loadedMagazines select 3);
 };
 
 // add assigned items
 { 
-	[_target,_x] call _add;
+	[_target, _x, { _target addItemToBackpack _x }] call _add;
 	_target assignItem _x;
 } forEach (_data select 0);
+
+clearAllItemsFromBackpack _target;
+
+// get assigned items, headgear and goggles is not part of assignedItems
+private ["_assignedItems","_headgear","_goggles"];
+_assignedItems = assignedItems _target;
+_headgear = headgear _target;
+_goggles = goggles _target;
+if((_headgear != "") && !(_headgear in _assignedItems)) then {
+	_assignedItems set [count _assignedItems, _headgear];
+};
+if((_goggles != "") && !(_goggles in _assignedItems)) then {
+	_assignedItems set [count _assignedItems, _goggles];
+};
+// add asigned items that could not be added with assign item
+// asuming each assigned item can be put only into one slot
+{
+	if(!(_x in _assignedItems)) then {
+		_target addWeapon _x;
+	}
+} forEach (_data select 0);
+
+
 
 // universal add weapon to hands
 _addWeapon = {
@@ -166,7 +182,7 @@ _addWeapon = {
 				};
 			};        	  
 			{
-				[_target, _x] call _add;
+				[_target, _x, { _target addItemToBackpack _x }] call _add;
 			} forEach _magazines; // add magazines							
 			_target addWeapon _weapon;                                                                                                                
 			{ 
@@ -263,7 +279,7 @@ if(_outfit != "") then {
 		if(loadUniform _target > 0) then {
 			_placeholderCount = _placeholderCount + 1;
 			{ 
-				[_target,_x] call _add; 
+				[_target, _x, { _target addItemToUniform _x }] call _add;
 			} forEach (_data select 8);			
 			while{true} do {
 				_loadBeforeAdd = loadUniform _target;
@@ -286,7 +302,7 @@ if(_outfit != "") then {
 		if(loadVest _target > 0) then {
 			_placeholderCount = _placeholderCount + 1;	
 			{ 
-				[_target,_x] call _add;
+				[_target, _x, { _target addItemToVest _x }] call _add;
 			} forEach (_data select 10);
 			while{true} do {
 				_loadBeforeAdd = loadVest _target;
@@ -300,38 +316,6 @@ if(_outfit != "") then {
 	};
 };      
  
-// more complex add function intended for use with backpack
-_add = {
-	private ["_target","_item"];
-	_target = _this select 0;
-	_item = _this select 1;
-	if(typename _item == "ARRAY") then {
-		if(_item select 0 != "") then {
-			if(_loadMagsAmmo) then {
-				_target addMagazine _item;
-			} else {
-				_target addMagazine (_item select 0);
-			};
-		};
-	} else {
-		if(isClass(configFile>>"CfgMagazines">>_item)) then {
-			(unitBackpack _target) addMagazineCargo [_item,1];
-		} else {
-			if(_item != "") then {
-				if(getNumber(configFile>>"CfgVehicles">>_item>>"isbackpack")==1) then {
-					(unitBackpack _target) addBackpackCargo [_item,1];  
-				} else {
-					if(isClass(configFile>>"CfgWeapons">>_item>>"WeaponSlotsInfo") && getNumber(configFile>>"CfgWeapons">>_item>>"showempty")==1) then {
-						(unitBackpack _target) addWeaponCargo [_item,1];  
-					} else {
-						_target addItem _item;         
-					};
-				};
-			};
-		};
-	};       
-};     
-
 // add backpack and add backpack items
 removeBackpack _target;
 _outfit = _data select 11; 
@@ -343,7 +327,7 @@ if(_outfit != "") then {
 		_placeholderCount = _placeholderCount + 1;
 		if(loadBackpack _target > 0) then {		
 			{
-				[_target, _x] call _add;
+				[_target, _x, { _target addItemToBackpack _x }] call _add;
 			} forEach (_data select 12);
 		};
 	} else {
