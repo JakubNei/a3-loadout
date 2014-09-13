@@ -2,7 +2,7 @@
 
 	AUTHOR: aeroson
 	NAPATH_ME: loadout_manager.sqf
-	VERSION: 1.3
+	VERSION: 1.4
 	
 	DOWNLOAD, DOCUMENTATION & PARTICIPATE:
 	https://github.com/aeroson/get-set-loadout
@@ -89,11 +89,6 @@ _mainMenu = {
 				_any = true;
 			};
 		};      	
-		for "_i" from 0 to 9 do {
-			if(!isnil {profileNameSpace getVariable format["vas_gear_%1",_i]}) then {
-				_any = true;
-			};
-		};
 		if(_any) then {	
 			_actions = _actions + [ _obj addAction ["<t color='#0099ee'>Load VAS loadout ...</t>", PATH_ME, ["vas_menu"], 2000] ];
 		};
@@ -297,13 +292,6 @@ switch (_args select 0) do {
 			};
 		};
 		
-		for "_i" from 0 to 9 do {
-			if(!isnil {profileNameSpace getVariable format["vas_gear_%1",_i]}) then {
-				_loadout = profileNameSpace getVariable format["vas_gear_%1",_i];				
-				_actions = _actions + [_obj addAction [format["<t color='#0088ee'>Load %1</t>", _loadout select 0], PATH_ME, ["vas_load",_i], 1000-_i]];
-			};
-		};
-		
 	};
 	
 
@@ -384,62 +372,6 @@ _bitems = _loadout select 14;
 	};
 	
 	
-	case "vas_load": {
-
-		_l = profileNameSpace getVariable format["vas_gear_%1",_arg1];		
-		_loadoutName = _l select 0;
-		hint parseText format["<t size='1' color='#0088ee'>Loading VAS loadout</t>"];
-		
-/*		
-0 _loadoutname ["mxm",
-1 _primary "arifle_MXM_F",
-2 _launcher "",
-3 _handgun "hgun_Rook40_snds_F",
-4 _magazines ["16Rnd_9x21_Mag","HandGrenade","HandGrenade","SmokeShellBlue","SmokeShellBlue","HandGrenade","SmokeShellBlue","20Rnd_762x45_Mag","20Rnd_762x45_Mag","20Rnd_762x45_Mag","20Rnd_762x45_Mag","20Rnd_762x45_Mag","20Rnd_762x45_Mag","20Rnd_762x45_Mag","20Rnd_762x45_Mag","20Rnd_762x45_Mag","20Rnd_762x45_Mag","SLAMDirectionalMine_Wire_Mag","SLAMDirectionalMine_Wire_Mag","SLAMDirectionalMine_Wire_Mag","HandGrenade","HandGrenade","HandGrenade","HandGrenade","HandGrenade","SmokeShellBlue","SmokeShellBlue","SmokeShellBlue","SmokeShellBlue","SmokeShellBlue","DemoCharge_Remote_Mag","DemoCharge_Remote_Mag","SLAMDirectionalMine_Wire_Mag","SatchelCharge_Remote_Mag","DemoCharge_Remote_Mag","SLAMDirectionalMine_Wire_Mag","SLAMDirectionalMine_Wire_Mag","20Rnd_762x45_Mag","20Rnd_762x45_Mag","20Rnd_762x45_Mag","20Rnd_762x45_Mag","20Rnd_762x45_Mag","20Rnd_762x45_Mag","20Rnd_762x45_Mag","20Rnd_762x45_Mag","20Rnd_762x45_Mag","HandGrenade","HandGrenade","HandGrenade","HandGrenade","HandGrenade","HandGrenade"],
-5 _uniform "U_B_CombatUniform_mcam_tshirt",
-6	_vest "V_PlateCarrier2_rgr",
-7	_backpack "B_Kitbag_mcamo",
-8 _items ["ItemMap","ItemCompass","ItemWatch","ItemRadio","ItemGPS","G_Shades_Black","H_PilotHelmetHeli_B","FirstAidKit","FirstAidKit","FirstAidKit","FirstAidKit","FirstAidKit","FirstAidKit","FirstAidKit","FirstAidKit","FirstAidKit","FirstAidKit","FirstAidKit","FirstAidKit","FirstAidKit"],
-9 _primitems ["muzzle_snds_B","acc_flashlight","optic_Arco"],
-10 _secitems [],
-11 _handgunitems ["muzzle_snds_L","",""]]
-*/
-
-	a=_l;
-	[_target, 
-		[
-			_l select 8,
-			
-			_l select 1,
-			_l select 9,
-			
-			_l select 3,
-			_l select 11, 
-			
-			_l select 2,
-			_l select 10,
-			
-			_l select 5,
-			[],
-			
-			_l select 6,
-			[],
-			
-			_l select 7,
-			[]
-		]
-	] call FUNC_setLoadout;
-				
-		{
-		[_target, _x] call _vasAdd; 
-	} forEach (_l select 4);
-
-		loadout = [_target] call FUNC_getLoadout; // to work with spawn loadout loading						 
-		hint parseText format["<t size='1' color='#0088ee'>Loaded VAS loadout</t>"];
-
-	};
-	
-
 
 
 	default {
