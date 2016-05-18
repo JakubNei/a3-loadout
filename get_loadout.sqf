@@ -57,6 +57,10 @@ _isFlashlightOn = false;
 _isIRLaserOn = false;
 
 _magazinesAmmo = magazinesAmmoFull _target;
+private _mags2 = [];
+{
+	_mags2 pushBack (_x select 0);
+} foreach _magazinesAmmo;¨
 
 // save weapon mode and muzzle
 if(_isOnFoot) then {
@@ -129,19 +133,17 @@ if(_saveMagsAmmo) then {
 		_items = _this select 0;		
 		_location = _this select 1;
 		{
-			_item = _x;
-			_itemIndex = _forEachIndex;
-			{
-				if((_x select 4)==_location && (_x select 0)==_item) then {
-					_items set[_itemIndex, [_item, _x select 1]];
-					_x = -1;					
-				};
-			} forEach _magazinesAmmo;
-			_magazinesAmmo = _magazinesAmmo - [-1];	
+			if(_x IN _mags2) then {
+				_items = _items - [_x];
+			};
 		} forEach _items;
+		{
+			if((_x select 4) == _location) then {
+				_items pushBack [_x select 0,_x select 1];
+			};
+		} foreach _magazinesAmmo;
 		_items;
 	};
-	
 };
 
 // get backpack items
