@@ -2,7 +2,7 @@
 
 	AUTHOR: aeroson
 	NAME: get_loadout.sqf
-	VERSION: 3.4
+	VERSION: 3.4.1
 	
 	DOWNLOAD & PARTICIPATE:
 	https://github.com/aeroson/a3-loadout
