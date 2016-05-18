@@ -31,7 +31,7 @@
 
 */
 
-private ["_target","_options","_saveMagsAmmo","_isRepetitive","_isOnFoot","_currentWeapon","_currentMode","_isFlashlightOn","_isIRLaserOn","_magazinesAmmo","_loadedMagazines","_saveWeaponMagazines","_getMagsAmmo","_backPackItems","_assignedItems","_data"];
+private ["_target","_options","_saveMagsAmmo","_isRepetitive","_isOnFoot","_currentWeapon","_currentMode","_isFlashlightOn","_isIRLaserOn","_magazinesAmmo","_loadedMagazines","_saveWeaponMagazines","_getMagsAmmo","_backPackItems","_assignedItems","_data","_magazinesAmmoClassNames"];
 
 _options = [];
 
@@ -57,10 +57,10 @@ _isFlashlightOn = false;
 _isIRLaserOn = false;
 
 _magazinesAmmo = magazinesAmmoFull _target;
-private _mags2 = [];
+_magazinesAmmoClassNames = [];
 {
-	_mags2 pushBack (_x select 0);
-} foreach _magazinesAmmo;¨
+	_magazinesAmmoClassNames pushBack (_x select 0);
+} foreach _magazinesAmmo;
 
 // save weapon mode and muzzle
 if(_isOnFoot) then {
@@ -133,13 +133,13 @@ if(_saveMagsAmmo) then {
 		_items = _this select 0;		
 		_location = _this select 1;
 		{
-			if(_x IN _mags2) then {
+			if(_x in _magazinesAmmoClassNames) then {
 				_items = _items - [_x];
 			};
 		} forEach _items;
 		{
 			if((_x select 4) == _location) then {
-				_items pushBack [_x select 0,_x select 1];
+				_items pushBack [_x select 0, _x select 1];
 			};
 		} foreach _magazinesAmmo;
 		_items;
@@ -170,7 +170,7 @@ if((_goggles != "") && !(_goggles in _assignedItems)) then {
 
 
 /*
-// use this once magazinesAmmoFull is fixed and shows magazines of assignedItems
+// use this if magazinesAmmoFull is fixed and shows magazines of assignedItems
 
 // get magazines of everything else except weapons, most likely assigned items
 // only ["Uniform","Vest","Backpack"] locations remain, weapon locations have already been eaten
